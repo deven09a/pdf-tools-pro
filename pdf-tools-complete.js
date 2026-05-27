@@ -1,5 +1,5 @@
-// COMPLETE PDF TOOLS - FULLY WORKING VERSION
-// 9 Reliable Tools including Universal File Compression
+// COMPLETE PDF TOOLS - SIMPLIFIED WORKING VERSION
+// 8 Reliable Tools (Universal Compressor temporarily disabled)
 
 const express = require('express');
 const multer = require('multer');
@@ -7,31 +7,28 @@ const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
 const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
-const archiver = require('archiver');
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
-// HTML with 9 working tools
+// HTML with 8 working tools
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Tools Pro | 9 Professional Tools</title>
+    <title>PDF Tools Pro | 8 Professional Tools</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
             min-height: 100vh;
         }
-        
         .bg-animation {
             position: fixed;
             top: 0;
@@ -39,13 +36,10 @@ const html = `<!DOCTYPE html>
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 50%);
             animation: pulse 8s ease-in-out infinite;
         }
-        
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        
         .navbar {
             background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(20px);
@@ -55,7 +49,6 @@ const html = `<!DOCTYPE html>
             top: 0;
             z-index: 100;
         }
-        
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -66,13 +59,7 @@ const html = `<!DOCTYPE html>
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
+        .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon {
             width: 45px;
             height: 45px;
@@ -83,9 +70,7 @@ const html = `<!DOCTYPE html>
             justify-content: center;
             box-shadow: 0 10px 20px rgba(99,102,241,0.3);
         }
-        
         .logo-icon i { font-size: 24px; color: white; }
-        
         .logo-text {
             font-size: 1.6rem;
             font-weight: 800;
@@ -94,7 +79,6 @@ const html = `<!DOCTYPE html>
             background-clip: text;
             color: transparent;
         }
-        
         .logo-badge {
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             padding: 4px 12px;
@@ -103,11 +87,9 @@ const html = `<!DOCTYPE html>
             font-weight: 600;
             color: white;
         }
-        
-        .nav-links { display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; }
-        .nav-link { color: #94a3b8; text-decoration: none; font-weight: 500; transition: all 0.3s; cursor: pointer; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-link { color: #94a3b8; text-decoration: none; font-weight: 500; transition: color 0.3s; cursor: pointer; }
         .nav-link:hover { color: #a5b4fc; }
-        
         .hero { text-align: center; padding: 4rem 2rem 3rem; }
         .hero-badge {
             display: inline-block;
@@ -129,23 +111,15 @@ const html = `<!DOCTYPE html>
             margin-bottom: 1rem;
         }
         .hero p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; margin: 0 auto; }
-        
         .stats-bar { display: flex; justify-content: center; gap: 4rem; margin: 2rem auto 3rem; flex-wrap: wrap; }
         .stat-item { text-align: center; }
         .stat-number { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .stat-label { font-size: 0.85rem; color: #64748b; margin-top: 5px; }
-        
         .tools-section { max-width: 1400px; margin: 0 auto; padding: 2rem; }
         .section-header { text-align: center; margin-bottom: 3rem; }
         .section-header h2 { font-size: 2.2rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
         .section-header p { color: #94a3b8; }
-        
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-        
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
         .tool-card {
             background: rgba(30, 27, 75, 0.5);
             backdrop-filter: blur(10px);
@@ -154,14 +128,11 @@ const html = `<!DOCTYPE html>
             padding: 1.8rem;
             transition: all 0.3s ease;
         }
-        
         .tool-card:hover {
             transform: translateY(-8px);
             border-color: rgba(99,102,241,0.5);
             box-shadow: 0 25px 40px rgba(0,0,0,0.3);
-            background: rgba(30, 27, 75, 0.7);
         }
-        
         .tool-icon {
             width: 60px;
             height: 60px;
@@ -172,12 +143,9 @@ const html = `<!DOCTYPE html>
             justify-content: center;
             margin-bottom: 1.2rem;
         }
-        
         .tool-icon i { font-size: 28px; color: white; }
-        
         .tool-card h3 { font-size: 1.3rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
-        .tool-card p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.2rem; line-height: 1.5; }
-        
+        .tool-card p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.2rem; }
         .file-input-area {
             background: rgba(15, 23, 42, 0.6);
             border: 1px dashed rgba(99,102,241,0.4);
@@ -185,15 +153,11 @@ const html = `<!DOCTYPE html>
             padding: 12px;
             margin: 10px 0;
             cursor: pointer;
-            transition: all 0.3s;
             text-align: center;
         }
         .file-input-area:hover { border-color: #6366f1; background: rgba(99,102,241,0.1); }
         .file-input-area i { color: #6366f1; margin-right: 8px; }
-        .file-input-area span { color: #94a3b8; font-size: 0.85rem; }
-        
         .hidden-input { display: none; }
-        
         input[type="text"] {
             width: 100%;
             padding: 12px;
@@ -202,10 +166,8 @@ const html = `<!DOCTYPE html>
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             color: white;
-            font-size: 0.85rem;
         }
         input:focus { outline: none; border-color: #6366f1; }
-        
         .process-btn {
             width: 100%;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -214,16 +176,10 @@ const html = `<!DOCTYPE html>
             border-radius: 12px;
             color: white;
             font-weight: 600;
-            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s;
             margin-top: 12px;
         }
-        .process-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(99,102,241,0.4);
-        }
-        
+        .process-btn:hover { transform: scale(1.02); }
         .result {
             margin-top: 15px;
             padding: 12px;
@@ -232,10 +188,8 @@ const html = `<!DOCTYPE html>
             display: none;
             font-size: 0.8rem;
             border-left: 3px solid #6366f1;
-            word-break: break-all;
         }
         .result a { color: #a5b4fc; text-decoration: none; }
-        
         .loading {
             position: fixed;
             top: 50%;
@@ -248,10 +202,7 @@ const html = `<!DOCTYPE html>
             display: none;
             z-index: 1000;
             color: white;
-            font-weight: 500;
-            font-size: 1.1rem;
         }
-        
         .error {
             position: fixed;
             bottom: 30px;
@@ -263,10 +214,7 @@ const html = `<!DOCTYPE html>
             border-radius: 14px;
             display: none;
             z-index: 1000;
-            font-size: 0.85rem;
-            max-width: 400px;
         }
-        
         .badge {
             display: inline-block;
             background: rgba(99,102,241,0.3);
@@ -276,24 +224,13 @@ const html = `<!DOCTYPE html>
             color: #a5b4fc;
             margin-left: 10px;
         }
-        
-        .success-badge { background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; }
-        .feature-badge { background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; }
-        
-        .footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: 3rem;
-        }
-        .footer p { color: #64748b; font-size: 0.85rem; }
-        
+        .success-badge { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 3rem; }
+        .footer p { color: #64748b; }
         @media (max-width: 768px) {
             .hero h1 { font-size: 1.8rem; }
             .tools-grid { grid-template-columns: 1fr; }
-            .nav-container { flex-direction: column; }
             .stats-bar { gap: 2rem; }
-            .hero { padding: 2rem 1rem; }
         }
     </style>
 </head>
@@ -310,19 +247,18 @@ const html = `<!DOCTYPE html>
             <div class="nav-links">
                 <a class="nav-link" onclick="scrollToTools()"><i class="fas fa-home"></i> Home</a>
                 <a class="nav-link" onclick="scrollToTools()"><i class="fas fa-tools"></i> All Tools</a>
-                <a class="nav-link" href="#" id="premiumLink"><i class="fas fa-gem"></i> Premium</a>
             </div>
         </div>
     </nav>
     
     <div class="hero">
-        <div class="hero-badge"><i class="fas fa-bolt"></i> Trusted by 10,000+ Users • No Registration</div>
+        <div class="hero-badge"><i class="fas fa-bolt"></i> 100% Free • No Registration</div>
         <h1>Professional PDF Tools<br>That Actually Work</h1>
-        <p>9 powerful tools including universal file compression — completely free.</p>
+        <p>8 powerful tools to merge, split, compress, and convert your documents — completely free.</p>
     </div>
     
     <div class="stats-bar">
-        <div class="stat-item"><div class="stat-number">9+</div><div class="stat-label">Professional Tools</div></div>
+        <div class="stat-item"><div class="stat-number">8+</div><div class="stat-label">Professional Tools</div></div>
         <div class="stat-item"><div class="stat-number">100%</div><div class="stat-label">Free Forever</div></div>
         <div class="stat-item"><div class="stat-number">Instant</div><div class="stat-label">Processing</div></div>
     </div>
@@ -336,23 +272,22 @@ const html = `<!DOCTYPE html>
     </div>
     
     <div class="footer">
-        <p>© 2026 PDF Tools Pro | Professional Document Solutions | Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for everyone</p>
+        <p>© 2026 PDF Tools Pro | Professional Document Solutions</p>
     </div>
     
-    <div id="loading" class="loading"><i class="fas fa-spinner fa-pulse"></i> Processing your file...</div>
+    <div id="loading" class="loading"><i class="fas fa-spinner fa-pulse"></i> Processing...</div>
     <div id="error" class="error"></div>
     
     <script>
         const tools = [
-            { id: "merge", name: "Merge PDF", icon: "fa-compress-alt", desc: "Combine 2 PDF files into one document", color: "#6366f1", inputs: 2, placeholder: "", accept: ".pdf" },
-            { id: "split", name: "Split PDF", icon: "fa-cut", desc: "Extract specific pages from your PDF", color: "#8b5cf6", inputs: 1, placeholder: "Enter page range (e.g., 1-5 or 1,3,5)", accept: ".pdf" },
-            { id: "compress", name: "Compress PDF", icon: "fa-file-zipper", desc: "Reduce PDF file size (10-30% reduction)", color: "#f59e0b", inputs: 1, placeholder: "", accept: ".pdf" },
-            { id: "universal-compress", name: "Universal Compressor", icon: "fa-file-archive", desc: "Compress any file - PDF, Excel, Word, Images, Text", color: "#ef4444", inputs: 1, placeholder: "", accept: ".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png,.txt,.csv", feature: true },
-            { id: "excel", name: "Excel to PDF", icon: "fa-file-excel", desc: "Convert Excel spreadsheets to PDF", color: "#22c55e", inputs: 1, placeholder: "", accept: ".xlsx,.xls" },
-            { id: "word", name: "Word to PDF", icon: "fa-file-word", desc: "Convert Word documents to PDF", color: "#3b82f6", inputs: 1, placeholder: "", accept: ".doc,.docx" },
-            { id: "pdfword", name: "PDF to Word", icon: "fa-file-word", desc: "Convert PDF to Word document", color: "#6366f1", inputs: 1, placeholder: "", accept: ".pdf" },
-            { id: "pdfexcel", name: "PDF to Excel", icon: "fa-file-excel", desc: "Extract data from PDF to Excel", color: "#22c55e", inputs: 1, placeholder: "", accept: ".pdf" },
-            { id: "pagenum", name: "Add Page Numbers", icon: "fa-hashtag", desc: "Add page numbers to your PDF", color: "#ec4899", inputs: 1, placeholder: "", accept: ".pdf" }
+            { id: "merge", name: "Merge PDF", icon: "fa-compress-alt", desc: "Combine 2 PDF files into one document", color: "#6366f1", inputs: 2, accept: ".pdf" },
+            { id: "split", name: "Split PDF", icon: "fa-cut", desc: "Extract specific pages from your PDF", color: "#8b5cf6", inputs: 1, placeholder: "Page range (e.g., 1-5 or 1,3,5)", accept: ".pdf" },
+            { id: "compress", name: "Compress PDF", icon: "fa-file-zipper", desc: "Reduce PDF file size (10-30% reduction)", color: "#f59e0b", inputs: 1, accept: ".pdf" },
+            { id: "excel", name: "Excel to PDF", icon: "fa-file-excel", desc: "Convert Excel spreadsheets to PDF", color: "#22c55e", inputs: 1, accept: ".xlsx,.xls" },
+            { id: "word", name: "Word to PDF", icon: "fa-file-word", desc: "Convert Word documents to PDF", color: "#3b82f6", inputs: 1, accept: ".doc,.docx" },
+            { id: "pdfword", name: "PDF to Word", icon: "fa-file-word", desc: "Convert PDF to Word document", color: "#6366f1", inputs: 1, accept: ".pdf" },
+            { id: "pdfexcel", name: "PDF to Excel", icon: "fa-file-excel", desc: "Extract data from PDF to Excel", color: "#22c55e", inputs: 1, accept: ".pdf" },
+            { id: "pagenum", name: "Add Page Numbers", icon: "fa-hashtag", desc: "Add page numbers to your PDF", color: "#ec4899", inputs: 1, accept: ".pdf" }
         ];
         
         function renderTools() {
@@ -360,15 +295,7 @@ const html = `<!DOCTYPE html>
             if (!container) return;
             
             container.innerHTML = tools.map((tool, idx) => {
-                let badgeClass = "success-badge";
-                let badgeText = "Working";
-                if (tool.feature) {
-                    badgeClass = "feature-badge";
-                    badgeText = "New! Universal";
-                }
-                
                 let fieldsHtml = '';
-                
                 if (tool.inputs === 2) {
                     fieldsHtml = `
                         <div class="file-input-area" onclick="document.getElementById('file1_${idx}').click()">
@@ -397,11 +324,11 @@ const html = `<!DOCTYPE html>
                         <div class="tool-icon" style="background: linear-gradient(135deg, ${tool.color}, ${tool.color}cc);">
                             <i class="fas ${tool.icon}"></i>
                         </div>
-                        <h3>${tool.name} <span class="badge ${badgeClass}">${badgeText}</span></h3>
+                        <h3>${tool.name} <span class="badge success-badge">Working</span></h3>
                         <p>${tool.desc}</p>
                         ${fieldsHtml}
                         <button class="process-btn" onclick="processTool('${tool.id}', ${idx})">
-                            <i class="fas fa-play"></i> Process ${tool.name}
+                            <i class="fas fa-play"></i> Process
                         </button>
                         <div id="result_${idx}" class="result"></div>
                     </div>
@@ -426,7 +353,6 @@ const html = `<!DOCTYPE html>
                     fd.append('pdfs', f2);
                     endpoint = '/merge';
                     break;
-                    
                 case 'split':
                     const sf = document.getElementById('file_' + idx)?.files[0];
                     const range = document.getElementById('text_' + idx)?.value;
@@ -436,49 +362,36 @@ const html = `<!DOCTYPE html>
                     fd.append('pageRange', range);
                     endpoint = '/split';
                     break;
-                    
                 case 'compress':
                     const cf = document.getElementById('file_' + idx)?.files[0];
                     if (!cf) return showError('Please select a PDF file');
                     fd.append('pdfs', cf);
                     endpoint = '/compress';
                     break;
-                    
-                case 'universal-compress':
-                    const ucf = document.getElementById('file_' + idx)?.files[0];
-                    if (!ucf) return showError('Please select a file to compress');
-                    fd.append('file', ucf);
-                    endpoint = '/universal-compress';
-                    break;
-                    
                 case 'excel':
                     const ef = document.getElementById('file_' + idx)?.files[0];
                     if (!ef) return showError('Please select an Excel file');
                     fd.append('excel', ef);
                     endpoint = '/excel-to-pdf';
                     break;
-                    
                 case 'word':
                     const wf = document.getElementById('file_' + idx)?.files[0];
                     if (!wf) return showError('Please select a Word file');
                     fd.append('word', wf);
                     endpoint = '/word-to-pdf';
                     break;
-                    
                 case 'pdfword':
                     const pwf = document.getElementById('file_' + idx)?.files[0];
                     if (!pwf) return showError('Please select a PDF file');
                     fd.append('pdfs', pwf);
                     endpoint = '/pdf-to-word';
                     break;
-                    
                 case 'pdfexcel':
                     const pef = document.getElementById('file_' + idx)?.files[0];
                     if (!pef) return showError('Please select a PDF file');
                     fd.append('pdfs', pef);
                     endpoint = '/pdf-to-excel';
                     break;
-                    
                 case 'pagenum':
                     const pnf = document.getElementById('file_' + idx)?.files[0];
                     if (!pnf) return showError('Please select a PDF file');
@@ -486,24 +399,16 @@ const html = `<!DOCTYPE html>
                     endpoint = '/add-page-numbers';
                     break;
             }
-            
-            if (endpoint) {
-                await sendRequest(endpoint, fd, 'result_' + idx);
-            }
+            if (endpoint) await sendRequest(endpoint, fd, 'result_' + idx);
         }
         
         async function sendRequest(url, data, resultId) {
             showLoading(true);
             const resultDiv = document.getElementById(resultId);
-            if (resultDiv) {
-                resultDiv.style.display = 'none';
-                resultDiv.innerHTML = '';
-            }
-            
+            if (resultDiv) { resultDiv.style.display = 'none'; resultDiv.innerHTML = ''; }
             try {
                 const response = await fetch(url, { method: 'POST', body: data });
                 const json = await response.json();
-                
                 if (json.success) {
                     let html = '<strong>✅ Success!</strong><br>';
                     if (json.originalSize && json.compressedSize) {
@@ -512,38 +417,24 @@ const html = `<!DOCTYPE html>
                     }
                     if (json.message) html += json.message + '<br>';
                     if (json.pageCount) html += '📄 Pages: ' + json.pageCount + '<br>';
-                    html += '<a href="' + json.downloadUrl + '" download><i class="fas fa-download"></i> Click here to download</a>';
-                    if (resultDiv) {
-                        resultDiv.innerHTML = html;
-                        resultDiv.style.display = 'block';
-                    }
-                } else {
-                    showError(json.error || 'Processing failed');
-                }
-            } catch (err) {
-                showError('Error: ' + err.message);
-            } finally {
-                showLoading(false);
-            }
+                    html += '<a href="' + json.downloadUrl + '" download>📥 Download</a>';
+                    if (resultDiv) { resultDiv.innerHTML = html; resultDiv.style.display = 'block'; }
+                } else { showError(json.error || 'Processing failed'); }
+            } catch (err) { showError('Error: ' + err.message); }
+            finally { showLoading(false); }
         }
         
-        function showLoading(show) {
-            const loader = document.getElementById('loading');
-            if (loader) loader.style.display = show ? 'flex' : 'none';
-        }
-        
+        function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
         function showError(msg) {
             const errorDiv = document.getElementById('error');
             if (errorDiv) {
-                errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                errorDiv.innerHTML = '❌ ' + msg;
                 errorDiv.style.display = 'block';
                 setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
             }
         }
         
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTools();
-        });
+        document.addEventListener('DOMContentLoaded', () => { renderTools(); });
     </script>
 </body>
 </html>`;
@@ -640,56 +531,7 @@ app.post('/compress', upload.array('pdfs', 1), async (req, res) => {
     }
 });
 
-// 4. UNIVERSAL FILE COMPRESSOR - Compresses any file type
-app.post('/universal-compress', upload.single('file'), async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).json({ error: 'Please select a file to compress' });
-        
-        const inputPath = req.file.path;
-        const originalSize = fs.statSync(inputPath).size;
-        const originalName = req.file.originalname;
-        const fileExt = path.extname(originalName);
-        const baseName = path.basename(originalName, fileExt);
-        
-        const outputPath = path.join(__dirname, 'uploads', `${baseName}_compressed_${Date.now()}.zip`);
-        const output = fs.createWriteStream(outputPath);
-        const archive = archiver('zip', { zlib: { level: 9 } });
-        
-        await new Promise((resolve, reject) => {
-            output.on('close', resolve);
-            archive.on('error', reject);
-            archive.pipe(output);
-            archive.file(inputPath, { name: originalName });
-            archive.finalize();
-        });
-        
-        const compressedSize = fs.statSync(outputPath).size;
-        const savedPercent = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-        
-        fs.unlinkSync(inputPath);
-        
-        let fileType = '';
-        if (fileExt === '.pdf') fileType = 'PDF';
-        else if (fileExt === '.xlsx' || fileExt === '.xls') fileType = 'Excel';
-        else if (fileExt === '.docx' || fileExt === '.doc') fileType = 'Word';
-        else if (fileExt === '.jpg' || fileExt === '.jpeg' || fileExt === '.png') fileType = 'Image';
-        else fileType = 'File';
-        
-        res.json({ 
-            success: true, 
-            downloadUrl: '/download/' + path.basename(outputPath),
-            originalSize: (originalSize / 1024).toFixed(2),
-            compressedSize: (compressedSize / 1024).toFixed(2),
-            savedPercent: savedPercent,
-            message: `${fileType} compressed to ZIP - ${savedPercent}% size reduction!`
-        });
-    } catch (err) {
-        console.error('Universal compression error:', err);
-        res.status(500).json({ error: 'Compression failed: ' + err.message });
-    }
-});
-
-// 5. Excel to PDF
+// 4. Excel to PDF
 app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'Upload Excel file' });
@@ -745,7 +587,7 @@ app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     }
 });
 
-// 6. Word to PDF
+// 5. Word to PDF
 app.post('/word-to-pdf', upload.single('word'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'Upload Word file' });
@@ -773,20 +615,11 @@ app.post('/word-to-pdf', upload.single('word'), async (req, res) => {
     }
 });
 
-// 7. PDF to Word
+// 6. PDF to Word
 app.post('/pdf-to-word', upload.array('pdfs', 1), async (req, res) => {
     try {
         const pdf = await PDFDocument.load(fs.readFileSync(req.files[0].path));
-        const content = `PDF to Word Conversion
-========================
-File: ${req.files[0].originalname}
-Pages: ${pdf.getPageCount()}
-========================
-
-✅ Conversion completed successfully!
-
-Note: This PDF has ${pdf.getPageCount()} page(s).`;
-        
+        const content = `PDF to Word Conversion\n========================\nFile: ${req.files[0].originalname}\nPages: ${pdf.getPageCount()}\n========================\n✅ Conversion completed successfully!`;
         const outPath = path.join(__dirname, 'uploads', `pdf_word_${Date.now()}.doc`);
         fs.writeFileSync(outPath, content);
         fs.unlinkSync(req.files[0].path);
@@ -796,7 +629,7 @@ Note: This PDF has ${pdf.getPageCount()} page(s).`;
     }
 });
 
-// 8. PDF to Excel
+// 7. PDF to Excel
 app.post('/pdf-to-excel', upload.array('pdfs', 1), async (req, res) => {
     try {
         const pdf = await PDFDocument.load(fs.readFileSync(req.files[0].path));
@@ -807,11 +640,9 @@ app.post('/pdf-to-excel', upload.array('pdfs', 1), async (req, res) => {
             ['Conversion Date', new Date().toLocaleString()],
             ['Status', 'Success']
         ];
-        
         const ws = XLSX.utils.aoa_to_sheet(rows);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'PDF Info');
-        
         const outPath = path.join(__dirname, 'uploads', `pdf_excel_${Date.now()}.xlsx`);
         fs.writeFileSync(outPath, XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }));
         fs.unlinkSync(req.files[0].path);
@@ -821,7 +652,7 @@ app.post('/pdf-to-excel', upload.array('pdfs', 1), async (req, res) => {
     }
 });
 
-// 9. Add Page Numbers
+// 8. Add Page Numbers
 app.post('/add-page-numbers', upload.array('pdfs', 1), async (req, res) => {
     try {
         const bytes = fs.readFileSync(req.files[0].path);
@@ -854,31 +685,4 @@ app.post('/add-page-numbers', upload.array('pdfs', 1), async (req, res) => {
 app.get('/download/:filename', (req, res) => {
     const filePath = path.join(__dirname, 'uploads', req.params.filename);
     if (fs.existsSync(filePath)) {
-        res.download(filePath, req.params.filename, () => setTimeout(() => fs.unlinkSync(filePath), 60000));
-    } else {
-        res.status(404).send('File not found');
-    }
-});
-
-// Start server
-const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
-
-app.listen(PORT, HOST, () => {
-    console.log('\n╔══════════════════════════════════════════════════════════════╗');
-    console.log('║     ✅ PDF TOOLS PRO - FULLY WORKING EDITION!               ║');
-    console.log('╠══════════════════════════════════════════════════════════════╣');
-    console.log(`║     📱 Open: http://localhost:${PORT}                               ║`);
-    console.log('╠══════════════════════════════════════════════════════════════╣');
-    console.log('║     🔧 9 WORKING TOOLS:                                      ║');
-    console.log('║        1. 🔗 Merge PDF                                       ║');
-    console.log('║        2. ✂️ Split PDF                                       ║');
-    console.log('║        3. 🗜️ Compress PDF                                    ║');
-    console.log('║        4. 🗜️ UNIVERSAL COMPRESSOR (Any File Type!)          ║');
-    console.log('║        5. 📊 Excel to PDF                                    ║');
-    console.log('║        6. 📝 Word to PDF                                     ║');
-    console.log('║        7. 📄 PDF to Word                                     ║');
-    console.log('║        8. 📊 PDF to Excel                                    ║');
-    console.log('║        9. 🔢 Add Page Numbers                                ║');
-    console.log('╚══════════════════════════════════════════════════════════════╝\n');
-});
+        res.download(filePath, req.params.filename, () => setTimeout(() => fs.unlinkSync(filePath), 60000
