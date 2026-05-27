@@ -856,12 +856,15 @@ app.get('/download/:filename', (req, res) => {
 });
 
 // Start server
-const PORT = 3000;
-app.listen(PORT, () => {
+// Start server - FIXED for Render deployment
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
     console.log('\n========================================================');
     console.log('     ✅ PDF TOOLS PRO (14 Tools) IS RUNNING!');
     console.log('========================================================');
-    console.log('📱 Open: http://localhost:3000');
+    console.log(`📱 Server running on http://${HOST}:${PORT}`);
     console.log('========================================================');
     console.log('📚 14 POWERFUL TOOLS (UPGRADED):');
     console.log('   1. 🔗 Merge PDF');
