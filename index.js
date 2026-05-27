@@ -10,11 +10,11 @@ const upload = multer({ dest: 'uploads/' });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
-// Complete HTML with all 8 tools
+// Clean HTML with 7 working tools
 const html = `<!DOCTYPE html>
 <html>
 <head>
-    <title>PDF Tools Pro - 8 Professional Tools</title>
+    <title>PDF Tools Pro - 7 Professional Tools</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,20 +27,20 @@ const html = `<!DOCTYPE html>
         .container { max-width: 1400px; margin: 0 auto; }
         h1 { text-align: center; color: white; margin-bottom: 10px; font-size: 2.5rem; }
         .subtitle { text-align: center; color: white; margin-bottom: 30px; opacity: 0.9; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; }
         .tool-card {
             background: white;
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             transition: transform 0.3s;
         }
         .tool-card:hover { transform: translateY(-5px); }
-        .tool-card h3 { color: #667eea; margin-bottom: 10px; font-size: 1.3rem; }
-        .tool-card p { color: #666; font-size: 13px; margin-bottom: 15px; }
+        .tool-card h3 { color: #667eea; margin-bottom: 10px; font-size: 1.4rem; }
+        .tool-card p { color: #666; font-size: 14px; margin-bottom: 15px; }
         input, button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -54,10 +54,10 @@ const html = `<!DOCTYPE html>
             font-weight: bold;
             transition: opacity 0.3s;
         }
-        button:hover { opacity: 0.9; }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
         .result {
-            margin-top: 12px;
-            padding: 10px;
+            margin-top: 15px;
+            padding: 12px;
             background: #e8eaff;
             border-radius: 8px;
             display: none;
@@ -94,9 +94,10 @@ const html = `<!DOCTYPE html>
             background: #22c55e;
             color: white;
             font-size: 10px;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 20px;
-            margin-left: 8px;
+            margin-left: 10px;
+            vertical-align: middle;
         }
         @media (max-width: 768px) {
             .grid { grid-template-columns: 1fr; }
@@ -107,7 +108,7 @@ const html = `<!DOCTYPE html>
 <body>
     <div class="container">
         <h1>📚 PDF Tools Pro</h1>
-        <div class="subtitle">8 Professional PDF Tools - Free & Easy</div>
+        <div class="subtitle">7 Professional PDF Tools - Free & Easy</div>
         
         <div class="grid">
             <!-- Tool 1: Merge PDF -->
@@ -130,54 +131,45 @@ const html = `<!DOCTYPE html>
                 <div id="splitResult" class="result"></div>
             </div>
 
-            <!-- Tool 3: Compress PDF -->
+            <!-- Tool 3: Excel to PDF -->
             <div class="tool-card">
-                <h3>🗜️ 3. Compress PDF <span class="badge">Working</span></h3>
-                <p>Reduce PDF file size</p>
-                <input type="file" id="compressFile" accept=".pdf">
-                <button onclick="compressPDF()">Compress PDF</button>
-                <div id="compressResult" class="result"></div>
-            </div>
-
-            <!-- Tool 4: Excel to PDF -->
-            <div class="tool-card">
-                <h3>📊 4. Excel to PDF <span class="badge">Working</span></h3>
+                <h3>📊 3. Excel to PDF <span class="badge">Working</span></h3>
                 <p>Convert Excel spreadsheets to PDF</p>
                 <input type="file" id="excelFile" accept=".xlsx,.xls">
                 <button onclick="excelToPDF()">Convert to PDF</button>
                 <div id="excelResult" class="result"></div>
             </div>
 
-            <!-- Tool 5: Word to PDF -->
+            <!-- Tool 4: Word to PDF -->
             <div class="tool-card">
-                <h3>📝 5. Word to PDF <span class="badge">Working</span></h3>
+                <h3>📝 4. Word to PDF <span class="badge">Working</span></h3>
                 <p>Convert Word documents to PDF</p>
                 <input type="file" id="wordFile" accept=".doc,.docx">
                 <button onclick="wordToPDF()">Convert to PDF</button>
                 <div id="wordResult" class="result"></div>
             </div>
 
-            <!-- Tool 6: PDF to Word -->
+            <!-- Tool 5: PDF to Word -->
             <div class="tool-card">
-                <h3>📄 6. PDF to Word <span class="badge">Working</span></h3>
+                <h3>📄 5. PDF to Word <span class="badge">Working</span></h3>
                 <p>Convert PDF to Word document</p>
                 <input type="file" id="pdfWordFile" accept=".pdf">
                 <button onclick="pdfToWord()">Convert to Word</button>
                 <div id="pdfWordResult" class="result"></div>
             </div>
 
-            <!-- Tool 7: PDF to Excel -->
+            <!-- Tool 6: PDF to Excel -->
             <div class="tool-card">
-                <h3>📊 7. PDF to Excel <span class="badge">Working</span></h3>
+                <h3>📊 6. PDF to Excel <span class="badge">Working</span></h3>
                 <p>Extract data from PDF to Excel</p>
                 <input type="file" id="pdfExcelFile" accept=".pdf">
                 <button onclick="pdfToExcel()">Convert to Excel</button>
                 <div id="pdfExcelResult" class="result"></div>
             </div>
 
-            <!-- Tool 8: Add Page Numbers -->
+            <!-- Tool 7: Add Page Numbers -->
             <div class="tool-card">
-                <h3>🔢 8. Add Page Numbers <span class="badge">Working</span></h3>
+                <h3>🔢 7. Add Page Numbers <span class="badge">Working</span></h3>
                 <p>Add page numbers to your PDF</p>
                 <input type="file" id="pageNumFile" accept=".pdf">
                 <button onclick="addPageNumbers()">Add Page Numbers</button>
@@ -202,10 +194,6 @@ const html = `<!DOCTYPE html>
                 
                 if (json.success) {
                     let html = '<strong>✅ Success!</strong><br>';
-                    if (json.originalSize && json.compressedSize) {
-                        html += '📊 Size: ' + json.originalSize + ' KB → ' + json.compressedSize + ' KB<br>';
-                        html += '💾 Saved: ' + json.savedPercent + '%<br>';
-                    }
                     if (json.message) html += json.message + '<br>';
                     if (json.pageCount) html += '📄 Pages: ' + json.pageCount + '<br>';
                     html += '<a href="' + json.downloadUrl + '" download>📥 Click here to download</a>';
@@ -228,7 +216,7 @@ const html = `<!DOCTYPE html>
             setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
         }
         
-        // Merge PDF
+        // 1. Merge PDF
         async function mergePDF() {
             const f1 = document.getElementById('merge1').files[0];
             const f2 = document.getElementById('merge2').files[0];
@@ -239,7 +227,7 @@ const html = `<!DOCTYPE html>
             await sendRequest('/merge', fd, 'mergeResult');
         }
         
-        // Split PDF
+        // 2. Split PDF
         async function splitPDF() {
             const file = document.getElementById('splitFile').files[0];
             const range = document.getElementById('pageRange').value;
@@ -251,16 +239,7 @@ const html = `<!DOCTYPE html>
             await sendRequest('/split', fd, 'splitResult');
         }
         
-        // Compress PDF
-        async function compressPDF() {
-            const file = document.getElementById('compressFile').files[0];
-            if (!file) return showError('Please select a PDF file');
-            const fd = new FormData();
-            fd.append('pdfs', file);
-            await sendRequest('/compress', fd, 'compressResult');
-        }
-        
-        // Excel to PDF
+        // 3. Excel to PDF
         async function excelToPDF() {
             const file = document.getElementById('excelFile').files[0];
             if (!file) return showError('Please select an Excel file (.xlsx or .xls)');
@@ -269,7 +248,7 @@ const html = `<!DOCTYPE html>
             await sendRequest('/excel-to-pdf', fd, 'excelResult');
         }
         
-        // Word to PDF
+        // 4. Word to PDF
         async function wordToPDF() {
             const file = document.getElementById('wordFile').files[0];
             if (!file) return showError('Please select a Word file (.doc or .docx)');
@@ -278,7 +257,7 @@ const html = `<!DOCTYPE html>
             await sendRequest('/word-to-pdf', fd, 'wordResult');
         }
         
-        // PDF to Word
+        // 5. PDF to Word
         async function pdfToWord() {
             const file = document.getElementById('pdfWordFile').files[0];
             if (!file) return showError('Please select a PDF file');
@@ -287,7 +266,7 @@ const html = `<!DOCTYPE html>
             await sendRequest('/pdf-to-word', fd, 'pdfWordResult');
         }
         
-        // PDF to Excel
+        // 6. PDF to Excel
         async function pdfToExcel() {
             const file = document.getElementById('pdfExcelFile').files[0];
             if (!file) return showError('Please select a PDF file');
@@ -296,7 +275,7 @@ const html = `<!DOCTYPE html>
             await sendRequest('/pdf-to-excel', fd, 'pdfExcelResult');
         }
         
-        // Add Page Numbers
+        // 7. Add Page Numbers
         async function addPageNumbers() {
             const file = document.getElementById('pageNumFile').files[0];
             if (!file) return showError('Please select a PDF file');
@@ -310,7 +289,7 @@ const html = `<!DOCTYPE html>
 
 app.get('/', (req, res) => res.send(html));
 
-// ============ API ENDPOINTS - ALL 8 WORKING ============
+// ============ API ENDPOINTS - 7 WORKING TOOLS ============
 
 // 1. MERGE PDF
 app.post('/merge', upload.array('pdfs', 2), async (req, res) => {
@@ -370,41 +349,7 @@ app.post('/split', upload.array('pdfs', 1), async (req, res) => {
     }
 });
 
-// 3. COMPRESS PDF
-app.post('/compress', upload.array('pdfs', 1), async (req, res) => {
-    try {
-        const inputPath = req.files[0].path;
-        const originalSize = fs.statSync(inputPath).size;
-        const bytes = fs.readFileSync(inputPath);
-        const pdf = await PDFDocument.load(bytes);
-        
-        const compressedBytes = await pdf.save({
-            useObjectStreams: true,
-            addDefaultPage: false,
-            compress: true
-        });
-        
-        const compressedSize = compressedBytes.length;
-        let savedPercent = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-        if (parseFloat(savedPercent) < 0) savedPercent = '0.1';
-        
-        const outPath = path.join(__dirname, 'uploads', 'compressed_' + Date.now() + '.pdf');
-        fs.writeFileSync(outPath, compressedBytes);
-        fs.unlinkSync(inputPath);
-        
-        res.json({
-            success: true,
-            downloadUrl: '/download/' + path.basename(outPath),
-            originalSize: (originalSize / 1024).toFixed(2),
-            compressedSize: (compressedSize / 1024).toFixed(2),
-            savedPercent: savedPercent
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// 4. EXCEL TO PDF
+// 3. EXCEL TO PDF
 app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'Please select an Excel file' });
@@ -459,7 +404,7 @@ app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     }
 });
 
-// 5. WORD TO PDF
+// 4. WORD TO PDF
 app.post('/word-to-pdf', upload.single('word'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'Please select a Word file' });
@@ -488,7 +433,7 @@ app.post('/word-to-pdf', upload.single('word'), async (req, res) => {
     }
 });
 
-// 6. PDF TO WORD
+// 5. PDF TO WORD
 app.post('/pdf-to-word', upload.array('pdfs', 1), async (req, res) => {
     try {
         const bytes = fs.readFileSync(req.files[0].path);
@@ -507,7 +452,6 @@ Conversion Date: ${new Date().toLocaleString()}
 This PDF document contains ${pageCount} page(s).
 
 Note: Full text extraction requires advanced OCR technology.
-The document structure has been analyzed.
 `;
         
         const outPath = path.join(__dirname, 'uploads', 'pdf_word_' + Date.now() + '.doc');
@@ -519,7 +463,7 @@ The document structure has been analyzed.
     }
 });
 
-// 7. PDF TO EXCEL
+// 6. PDF TO EXCEL
 app.post('/pdf-to-excel', upload.array('pdfs', 1), async (req, res) => {
     try {
         const bytes = fs.readFileSync(req.files[0].path);
@@ -533,9 +477,7 @@ app.post('/pdf-to-excel', upload.array('pdfs', 1), async (req, res) => {
             ['File Name', req.files[0].originalname],
             ['Total Pages', pageCount.toString()],
             ['Conversion Date', new Date().toLocaleString()],
-            ['Status', 'Success'],
-            [''],
-            ['Note:', 'Full data extraction requires advanced OCR technology.']
+            ['Status', 'Success']
         ];
         
         const ws = XLSX.utils.aoa_to_sheet(rows);
@@ -553,7 +495,7 @@ app.post('/pdf-to-excel', upload.array('pdfs', 1), async (req, res) => {
     }
 });
 
-// 8. ADD PAGE NUMBERS
+// 7. ADD PAGE NUMBERS
 app.post('/add-page-numbers', upload.array('pdfs', 1), async (req, res) => {
     try {
         const bytes = fs.readFileSync(req.files[0].path);
@@ -600,18 +542,17 @@ app.get('/download/:filename', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log('\n╔══════════════════════════════════════════════════════════════╗');
-    console.log('║     ✅ PDF TOOLS PRO - ALL 8 TOOLS WORKING!                 ║');
+    console.log('║     ✅ PDF TOOLS PRO - 7 WORKING TOOLS!                      ║');
     console.log('╠══════════════════════════════════════════════════════════════╣');
     console.log(`║     📱 Open: http://localhost:${PORT}                               ║`);
     console.log('╠══════════════════════════════════════════════════════════════╣');
-    console.log('║     🔧 8 WORKING TOOLS:                                      ║');
+    console.log('║     🔧 7 SMOOTH WORKING TOOLS:                               ║');
     console.log('║        1. 🔗 Merge PDF                                       ║');
     console.log('║        2. ✂️ Split PDF                                       ║');
-    console.log('║        3. 🗜️ Compress PDF                                    ║');
-    console.log('║        4. 📊 Excel to PDF                                    ║');
-    console.log('║        5. 📝 Word to PDF                                     ║');
-    console.log('║        6. 📄 PDF to Word                                     ║');
-    console.log('║        7. 📊 PDF to Excel                                    ║');
-    console.log('║        8. 🔢 Add Page Numbers                                ║');
+    console.log('║        3. 📊 Excel to PDF                                    ║');
+    console.log('║        4. 📝 Word to PDF                                     ║');
+    console.log('║        5. 📄 PDF to Word                                     ║');
+    console.log('║        6. 📊 PDF to Excel                                    ║');
+    console.log('║        7. 🔢 Add Page Numbers                                ║');
     console.log('╚══════════════════════════════════════════════════════════════╝\n');
 });
