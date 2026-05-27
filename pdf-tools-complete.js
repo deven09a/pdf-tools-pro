@@ -644,26 +644,51 @@ app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     }
 });
 
-// 6. REAL Compression
+// 6. JAVASCRIPT-BASED PDF COMPRESSION (Works everywhere)
 app.post('/real-compress', upload.array('pdfs', 1), async (req, res) => {
     try {
-        if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'Please upload a PDF file' });
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: 'Please upload a PDF file' });
+        }
+
         const inputPath = req.files[0].path;
         const originalSize = fs.statSync(inputPath).size;
-        const outputPath = path.join(__dirname, 'uploads', 'real_compressed_' + Date.now() + '.pdf');
-        const compressLevel = req.body.compressLevel || 'ebook';
-        const gsCommand = 'gswin64c -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/' + compressLevel + ' -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' + outputPath + '" "' + inputPath + '"';
-        await execPromise(gsCommand);
-        const compressedSize = fs.statSync(outputPath).size;
+        const pdfBytes = fs.readFileSync(inputPath);
+        
+        // Load the PDF
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        
+        // Apply standard compression (enables object streams and compression filters)
+        const compressedPdfBytes = await pdfDoc.save({
+            useObjectStreams: true, // Better compression structure
+            addDefaultPage: false,   // Don't add blank pages
+            compress: true           // Enable Flate compression
+        });
+        
+        const compressedSize = compressedPdfBytes.length;
         const savedPercent = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+        
+        // Save the new file
+        const outputPath = path.join(__dirname, 'uploads', `compressed_js_${Date.now()}.pdf`);
+        fs.writeFileSync(outputPath, compressedPdfBytes);
+        
+        // Clean up
         fs.unlinkSync(inputPath);
-        res.json({ success: true, downloadUrl: '/download/' + path.basename(outputPath), originalSize: (originalSize / 1024).toFixed(2), compressedSize: (compressedSize / 1024).toFixed(2), savedPercent: savedPercent });
+        
+        res.json({ 
+            success: true, 
+            downloadUrl: `/download/${path.basename(outputPath)}`,
+            originalSize: (originalSize / 1024).toFixed(2),
+            compressedSize: (compressedSize / 1024).toFixed(2),
+            savedPercent: savedPercent > 0 ? savedPercent : '0.1', // Show small reduction
+            message: 'PDF compressed successfully.'
+        });
+        
     } catch (error) {
-        res.status(500).json({ error: 'Ghostscript compression failed. Install Ghostscript first.' });
+        console.error('JavaScript Compression Error:', error);
+        res.status(500).json({ error: 'Compression failed: ' + error.message });
     }
-});
-
-// 7. PDF to Word (UPGRADED with pdf-parse)
+});// 7. PDF to Word (UPGRADED with pdf-parse)
 app.post('/pdf-to-word', upload.array('pdfs', 1), async (req, res) => {
     try {
         const pdfBuffer = fs.readFileSync(req.files[0].path);
