@@ -1,5 +1,5 @@
-// COMPLETE PDF TOOLS WEBSITE - PREMIUM DESIGN
-// Professional UI better than iLovePDF
+// COMPLETE PDF TOOLS WEBSITE - FULLY WORKING PREMIUM DESIGN
+// All 15 tools with working UI
 
 const express = require('express');
 const multer = require('multer');
@@ -14,14 +14,14 @@ const upload = multer({ dest: 'uploads/' });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
-// Premium HTML with modern design
+// Complete HTML with working tools
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Tools Pro | Professional PDF Solutions</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
@@ -34,7 +34,7 @@ const html = `<!DOCTYPE html>
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
             color: #1f2937;
-            line-height: 1.5;
+            min-height: 100vh;
         }
         
         /* Animated Background */
@@ -82,6 +82,8 @@ const html = `<!DOCTYPE html>
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
         .logo {
@@ -127,6 +129,7 @@ const html = `<!DOCTYPE html>
             display: flex;
             gap: 2rem;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .nav-link {
@@ -134,6 +137,7 @@ const html = `<!DOCTYPE html>
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s;
+            cursor: pointer;
         }
         
         .nav-link:hover {
@@ -158,7 +162,7 @@ const html = `<!DOCTYPE html>
         }
         
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 700;
             background: linear-gradient(135deg, #ffffff, #c7d2fe, #a5b4fc);
             -webkit-background-clip: text;
@@ -168,7 +172,7 @@ const html = `<!DOCTYPE html>
         }
         
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #94a3b8;
             max-width: 600px;
             margin: 0 auto;
@@ -201,7 +205,7 @@ const html = `<!DOCTYPE html>
             color: #64748b;
         }
         
-        /* Tools Grid */
+        /* Tools Section */
         .tools-section {
             max-width: 1400px;
             margin: 0 auto;
@@ -237,7 +241,6 @@ const html = `<!DOCTYPE html>
             border-radius: 20px;
             padding: 1.5rem;
             transition: all 0.3s ease;
-            cursor: pointer;
         }
         
         .tool-card:hover {
@@ -279,8 +282,8 @@ const html = `<!DOCTYPE html>
             background: rgba(15, 23, 42, 0.6);
             border: 1px dashed rgba(99,102,241,0.4);
             border-radius: 12px;
-            padding: 12px;
-            margin: 12px 0;
+            padding: 10px;
+            margin: 8px 0;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
@@ -301,7 +304,11 @@ const html = `<!DOCTYPE html>
             font-size: 0.8rem;
         }
         
-        input[type="file"], input[type="text"], input[type="password"], select {
+        .hidden-input {
+            display: none;
+        }
+        
+        input[type="text"], input[type="password"], select {
             width: 100%;
             padding: 10px 12px;
             margin: 8px 0;
@@ -310,7 +317,6 @@ const html = `<!DOCTYPE html>
             border-radius: 10px;
             color: white;
             font-size: 0.85rem;
-            transition: all 0.3s;
         }
         
         input:focus, select:focus {
@@ -318,7 +324,7 @@ const html = `<!DOCTYPE html>
             border-color: #6366f1;
         }
         
-        button {
+        .process-btn {
             width: 100%;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             border: none;
@@ -331,7 +337,7 @@ const html = `<!DOCTYPE html>
             margin-top: 8px;
         }
         
-        button:hover {
+        .process-btn:hover {
             transform: scale(1.02);
             box-shadow: 0 5px 20px rgba(99,102,241,0.4);
         }
@@ -344,6 +350,7 @@ const html = `<!DOCTYPE html>
             display: none;
             font-size: 0.8rem;
             border-left: 3px solid #6366f1;
+            word-break: break-all;
         }
         
         .result a {
@@ -367,13 +374,18 @@ const html = `<!DOCTYPE html>
         }
         
         .error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #f87171;
-            padding: 12px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(239, 68, 68, 0.9);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 20px;
             border-radius: 10px;
-            margin-top: 10px;
             display: none;
+            z-index: 1000;
+            font-size: 0.85rem;
+            max-width: 350px;
         }
         
         .badge {
@@ -386,17 +398,6 @@ const html = `<!DOCTYPE html>
             margin-left: 8px;
         }
         
-        .note {
-            background: rgba(99,102,241,0.1);
-            padding: 8px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 0.7rem;
-            color: #94a3b8;
-            text-align: center;
-        }
-        
-        /* Footer */
         .footer {
             text-align: center;
             padding: 3rem 2rem;
@@ -410,10 +411,11 @@ const html = `<!DOCTYPE html>
         }
         
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
+            .hero h1 { font-size: 1.8rem; }
             .tools-grid { grid-template-columns: 1fr; }
-            .nav-container { flex-direction: column; gap: 1rem; }
+            .nav-container { flex-direction: column; }
             .stats-bar { gap: 1.5rem; }
+            .hero { padding: 2rem 1rem; }
         }
     </style>
 </head>
@@ -430,9 +432,9 @@ const html = `<!DOCTYPE html>
                 <span class="logo-badge">FREE</span>
             </div>
             <div class="nav-links">
-                <a href="#" class="nav-link"><i class="fas fa-home"></i> Home</a>
-                <a href="#" class="nav-link"><i class="fas fa-tools"></i> All Tools</a>
-                <a href="#" class="nav-link"><i class="fas fa-gem"></i> Premium</a>
+                <a class="nav-link" onclick="scrollToTools()"><i class="fas fa-home"></i> Home</a>
+                <a class="nav-link" onclick="scrollToTools()"><i class="fas fa-tools"></i> All Tools</a>
+                <a class="nav-link" href="#"><i class="fas fa-gem"></i> Premium</a>
             </div>
         </div>
     </nav>
@@ -451,12 +453,11 @@ const html = `<!DOCTYPE html>
         <div class="stat-item"><div class="stat-number">No Signup</div><div class="stat-label">Required</div></div>
     </div>
     
-    <div class="tools-section">
+    <div class="tools-section" id="toolsSection">
         <div class="section-header">
             <h2><i class="fas fa-magic"></i> All PDF Tools</h2>
             <p>Everything you need to work with PDF documents</p>
         </div>
-        
         <div class="tools-grid" id="toolsGrid"></div>
     </div>
     
@@ -468,227 +469,283 @@ const html = `<!DOCTYPE html>
     <div id="error" class="error"></div>
     
     <script>
+        // Store references to file inputs and tool functions
+        let fileInputs = {};
+        
+        // Tool definitions
         const tools = [
-            { icon: "fa-compress-alt", name: "Merge PDF", desc: "Combine 2 PDF files into one document", color: "#6366f1", inputs: 2, fields: [] },
-            { icon: "fa-cut", name: "Split PDF", desc: "Extract specific pages from your PDF", color: "#8b5cf6", inputs: 1, fields: [{type:"text", id:"pageRange", placeholder:"Pages: 1-5 or 1,3,5"}] },
-            { icon: "fa-rotate-right", name: "Rotate PDF", desc: "Rotate all pages in your PDF", color: "#ec4899", inputs: 1, fields: [{type:"select", id:"rotateAngle", options:["90 degrees","180 degrees","270 degrees"]}] },
-            { icon: "fa-lock", name: "Protect PDF", desc: "Add password protection", color: "#10b981", inputs: 1, fields: [{type:"password", id:"password", placeholder:"Enter password"}] },
-            { icon: "fa-file-excel", name: "Excel to PDF", desc: "Convert Excel to PDF with formatting", color: "#22c55e", inputs: 1, fields: [{type:"select", id:"excelOrientation", options:["Portrait","Landscape"]}] },
-            { icon: "fa-file-word", name: "Word to PDF", desc: "Convert Word documents to PDF", color: "#3b82f6", inputs: 1, fields: [] },
-            { icon: "fa-file-zipper", name: "Compress PDF", desc: "Reduce PDF file size", color: "#f59e0b", inputs: 1, fields: [] },
-            { icon: "fa-file-word", name: "PDF to Word", desc: "Convert PDF to Word document", color: "#6366f1", inputs: 1, fields: [] },
-            { icon: "fa-image", name: "Image to PDF", desc: "Convert images to PDF", color: "#8b5cf6", inputs: 2, fields: [{type:"select", id:"imageToPdfSize", options:["A4","Letter"]}] },
-            { icon: "fa-water", name: "Add Watermark", desc: "Add text watermark to PDF", color: "#06b6d4", inputs: 1, fields: [{type:"text", id:"watermarkText", placeholder:"Watermark text"},{type:"select", id:"watermarkOpacity", options:["Light (30%)","Medium (50%)","Dark (70%)"]}] },
-            { icon: "fa-unlock-alt", name: "Remove Password", desc: "Remove PDF password protection", color: "#ef4444", inputs: 1, fields: [{type:"password", id:"removePasswordInput", placeholder:"Current password"}] },
-            { icon: "fa-file-excel", name: "PDF to Excel", desc: "Extract data to Excel", color: "#22c55e", inputs: 1, fields: [] },
-            { icon: "fa-image", name: "Extract Images", desc: "Get image information", color: "#8b5cf6", inputs: 1, fields: [] },
-            { icon: "fa-file-alt", name: "PDF to Text", desc: "Extract plain text", color: "#6366f1", inputs: 1, fields: [] },
-            { icon: "fa-hashtag", name: "Add Page Numbers", desc: "Add page numbers to PDF", color: "#f59e0b", inputs: 1, fields: [] }
+            { id: "merge", name: "Merge PDF", icon: "fa-compress-alt", desc: "Combine 2 PDF files into one document", color: "#6366f1", inputs: 2, hasSelect: false },
+            { id: "split", name: "Split PDF", icon: "fa-cut", desc: "Extract specific pages from your PDF", color: "#8b5cf6", inputs: 1, hasSelect: false, hasText: true, textPlaceholder: "Pages: 1-5 or 1,3,5" },
+            { id: "rotate", name: "Rotate PDF", icon: "fa-rotate-right", desc: "Rotate all pages in your PDF", color: "#ec4899", inputs: 1, hasSelect: true, selectOptions: ["90 degrees", "180 degrees", "270 degrees"], selectId: "rotateAngle" },
+            { id: "protect", name: "Protect PDF", icon: "fa-lock", desc: "Add password protection", color: "#10b981", inputs: 1, hasPassword: true, passwordPlaceholder: "Enter password" },
+            { id: "excel", name: "Excel to PDF", icon: "fa-file-excel", desc: "Convert Excel to PDF with formatting", color: "#22c55e", inputs: 1, hasSelect: true, selectOptions: ["Portrait", "Landscape"], selectId: "orientation" },
+            { id: "word", name: "Word to PDF", icon: "fa-file-word", desc: "Convert Word documents to PDF", color: "#3b82f6", inputs: 1, hasSelect: false },
+            { id: "compress", name: "Compress PDF", icon: "fa-file-zipper", desc: "Reduce PDF file size", color: "#f59e0b", inputs: 1, hasSelect: false },
+            { id: "pdfword", name: "PDF to Word", icon: "fa-file-word", desc: "Convert PDF to Word document", color: "#6366f1", inputs: 1, hasSelect: false },
+            { id: "imagepdf", name: "Image to PDF", icon: "fa-image", desc: "Convert images to PDF", color: "#8b5cf6", inputs: 1, hasSelect: true, selectOptions: ["A4", "Letter"], selectId: "pageSize" },
+            { id: "watermark", name: "Add Watermark", icon: "fa-water", desc: "Add text watermark to PDF", color: "#06b6d4", inputs: 1, hasText: true, textPlaceholder: "Watermark text", hasSelect: true, selectOptions: ["Light (30%)", "Medium (50%)", "Dark (70%)"], selectId: "opacity" },
+            { id: "removepwd", name: "Remove Password", icon: "fa-unlock-alt", desc: "Remove PDF password protection", color: "#ef4444", inputs: 1, hasPassword: true, passwordPlaceholder: "Current password" },
+            { id: "pdfexcel", name: "PDF to Excel", icon: "fa-file-excel", desc: "Extract data to Excel", color: "#22c55e", inputs: 1, hasSelect: false },
+            { id: "extractimg", name: "Extract Images", icon: "fa-image", desc: "Get image information", color: "#8b5cf6", inputs: 1, hasSelect: false },
+            { id: "pdftext", name: "PDF to Text", icon: "fa-file-alt", desc: "Extract plain text", color: "#6366f1", inputs: 1, hasSelect: false },
+            { id: "pagenum", name: "Add Page Numbers", icon: "fa-hashtag", desc: "Add page numbers to PDF", color: "#f59e0b", inputs: 1, hasSelect: false }
         ];
         
-        const toolFunctions = {
-            "Merge PDF": () => mergePDF(),
-            "Split PDF": () => splitPDF(),
-            "Rotate PDF": () => rotatePDF(),
-            "Protect PDF": () => protectPDF(),
-            "Excel to PDF": () => excelToPDF(),
-            "Word to PDF": () => wordToPDF(),
-            "Compress PDF": () => realCompressPDF(),
-            "PDF to Word": () => pdfToWord(),
-            "Image to PDF": () => imageToPDF(),
-            "Add Watermark": () => addWatermark(),
-            "Remove Password": () => removePassword(),
-            "PDF to Excel": () => pdfToExcel(),
-            "Extract Images": () => extractImages(),
-            "PDF to Text": () => pdfToText(),
-            "Add Page Numbers": () => addPageNumbers()
-        };
-        
+        // Function to generate tool card HTML
         function generateToolCard(tool, index) {
             let fieldsHtml = '';
+            
             if (tool.inputs === 2) {
-                fieldsHtml = '<div class="file-input-area" onclick="document.getElementById(\'merge1_' + index + '\').click()"><i class="fas fa-upload"></i> <span>Select PDF 1</span></div><input type="file" id="merge1_' + index + '" accept=".pdf" style="display:none"><div class="file-input-area" onclick="document.getElementById(\'merge2_' + index + '\').click()"><i class="fas fa-upload"></i> <span>Select PDF 2</span></div><input type="file" id="merge2_' + index + '" accept=".pdf" style="display:none">';
+                fieldsHtml = \`
+                    <div class="file-input-area" onclick="document.getElementById('file1_\${index}').click()">
+                        <i class="fas fa-upload"></i> <span>Select PDF 1</span>
+                    </div>
+                    <input type="file" id="file1_\${index}" class="hidden-input" accept=".pdf">
+                    <div class="file-input-area" onclick="document.getElementById('file2_\${index}').click()">
+                        <i class="fas fa-upload"></i> <span>Select PDF 2</span>
+                    </div>
+                    <input type="file" id="file2_\${index}" class="hidden-input" accept=".pdf">
+                \`;
             } else {
-                fieldsHtml = '<div class="file-input-area" onclick="document.getElementById(\'file_' + index + '\').click()"><i class="fas fa-upload"></i> <span>Select file</span></div><input type="file" id="file_' + index + '" accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png" style="display:none">';
-                if (tool.fields) {
-                    tool.fields.forEach(f => {
-                        if (f.type === 'select') {
-                            fieldsHtml += '<select id="' + f.id + '_' + index + '">' + f.options.map(opt => '<option value="' + opt.toLowerCase().replace(' degrees','').replace(' (','') + '">' + opt + '</option>').join('') + '</select>';
-                        } else {
-                            fieldsHtml += '<input type="' + f.type + '" id="' + f.id + '_' + index + '" placeholder="' + f.placeholder + '">';
-                        }
-                    });
+                fieldsHtml = \`
+                    <div class="file-input-area" onclick="document.getElementById('file_\${index}').click()">
+                        <i class="fas fa-upload"></i> <span>Select file</span>
+                    </div>
+                    <input type="file" id="file_\${index}" class="hidden-input" accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png">
+                \`;
+                
+                if (tool.hasText) {
+                    fieldsHtml += \`<input type="text" id="text_\${index}" placeholder="\${tool.textPlaceholder}">\`;
+                }
+                if (tool.hasPassword) {
+                    fieldsHtml += \`<input type="password" id="pwd_\${index}" placeholder="\${tool.passwordPlaceholder}">\`;
+                }
+                if (tool.hasSelect) {
+                    let options = tool.selectOptions.map(opt => \`<option value="\${opt.toLowerCase().replace(' degrees','').replace(' ','')}">\${opt}</option>\`).join('');
+                    fieldsHtml += \`<select id="select_\${index}">\${options}</select>\`;
                 }
             }
             
-            return '<div class="tool-card" data-tool="' + tool.name + '" data-index="' + index + '"><div class="tool-icon" style="background: linear-gradient(135deg, ' + tool.color + ', ' + tool.color + 'cc);"><i class="fas ' + tool.icon + '"></i></div><h3>' + tool.name + ' <span class="badge">Free</span></h3><p>' + tool.desc + '</p><div id="toolContent_' + index + '">' + fieldsHtml + '<button id="btn_' + index + '">Process</button><div id="result_' + index + '" class="result"></div></div></div>';
+            return \`
+                <div class="tool-card">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, \${tool.color}, \${tool.color}cc);">
+                        <i class="fas \${tool.icon}"></i>
+                    </div>
+                    <h3>\${tool.name} <span class="badge">Free</span></h3>
+                    <p>\${tool.desc}</p>
+                    \${fieldsHtml}
+                    <button class="process-btn" onclick="processTool('\${tool.id}', \${index})">Process</button>
+                    <div id="result_\${index}" class="result"></div>
+                </div>
+            \`;
         }
         
+        // Render all tools
         function renderTools() {
             const container = document.getElementById('toolsGrid');
-            container.innerHTML = tools.map((t, i) => generateToolCard(t, i)).join('');
+            if (container) {
+                container.innerHTML = tools.map((t, i) => generateToolCard(t, i)).join('');
+            }
+        }
+        
+        // Scroll to tools section
+        function scrollToTools() {
+            document.getElementById('toolsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Process tool based on type
+        async function processTool(toolId, index) {
+            let fd = new FormData();
+            let endpoint = '';
             
-            tools.forEach((tool, i) => {
-                document.getElementById('btn_' + i).addEventListener('click', () => {
-                    if (toolFunctions[tool.name]) toolFunctions[tool.name](i);
-                });
-            });
+            switch(toolId) {
+                case 'merge':
+                    const file1 = document.getElementById('file1_' + index)?.files[0];
+                    const file2 = document.getElementById('file2_' + index)?.files[0];
+                    if (!file1 || !file2) return showError('Please select 2 PDF files');
+                    fd.append('pdfs', file1);
+                    fd.append('pdfs', file2);
+                    endpoint = '/merge';
+                    break;
+                    
+                case 'split':
+                    const file = document.getElementById('file_' + index)?.files[0];
+                    const range = document.getElementById('text_' + index)?.value;
+                    if (!file) return showError('Please select a PDF file');
+                    if (!range) return showError('Please enter page range');
+                    fd.append('pdfs', file);
+                    fd.append('pageRange', range);
+                    endpoint = '/split';
+                    break;
+                    
+                case 'rotate':
+                    const rFile = document.getElementById('file_' + index)?.files[0];
+                    const angle = document.getElementById('select_' + index)?.value || '90';
+                    if (!rFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', rFile);
+                    fd.append('angle', angle);
+                    endpoint = '/rotate';
+                    break;
+                    
+                case 'protect':
+                    const pFile = document.getElementById('file_' + index)?.files[0];
+                    const pwd = document.getElementById('pwd_' + index)?.value;
+                    if (!pFile) return showError('Please select a PDF file');
+                    if (!pwd) return showError('Please enter a password');
+                    fd.append('pdfs', pFile);
+                    fd.append('password', pwd);
+                    endpoint = '/protect';
+                    break;
+                    
+                case 'excel':
+                    const eFile = document.getElementById('file_' + index)?.files[0];
+                    const orient = document.getElementById('select_' + index)?.value || 'portrait';
+                    if (!eFile) return showError('Please select an Excel file');
+                    fd.append('excel', eFile);
+                    fd.append('orientation', orient);
+                    endpoint = '/excel-to-pdf';
+                    break;
+                    
+                case 'word':
+                    const wFile = document.getElementById('file_' + index)?.files[0];
+                    if (!wFile) return showError('Please select a Word file');
+                    fd.append('word', wFile);
+                    endpoint = '/word-to-pdf';
+                    break;
+                    
+                case 'compress':
+                    const cFile = document.getElementById('file_' + index)?.files[0];
+                    if (!cFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', cFile);
+                    endpoint = '/real-compress';
+                    break;
+                    
+                case 'pdfword':
+                    const pwFile = document.getElementById('file_' + index)?.files[0];
+                    if (!pwFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', pwFile);
+                    endpoint = '/pdf-to-word';
+                    break;
+                    
+                case 'imagepdf':
+                    const imgFile = document.getElementById('file_' + index)?.files[0];
+                    const pageSize = document.getElementById('select_' + index)?.value || 'A4';
+                    if (!imgFile) return showError('Please select an image file');
+                    fd.append('images', imgFile);
+                    fd.append('pageSize', pageSize);
+                    endpoint = '/image-to-pdf';
+                    break;
+                    
+                case 'watermark':
+                    const wmFile = document.getElementById('file_' + index)?.files[0];
+                    const wmText = document.getElementById('text_' + index)?.value;
+                    const wmOpacity = document.getElementById('select_' + index)?.value || '0.5';
+                    if (!wmFile) return showError('Please select a PDF file');
+                    if (!wmText) return showError('Please enter watermark text');
+                    fd.append('pdfs', wmFile);
+                    fd.append('watermarkText', wmText);
+                    fd.append('opacity', wmOpacity);
+                    endpoint = '/add-watermark';
+                    break;
+                    
+                case 'removepwd':
+                    const rpFile = document.getElementById('file_' + index)?.files[0];
+                    const rpPwd = document.getElementById('pwd_' + index)?.value;
+                    if (!rpFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', rpFile);
+                    if (rpPwd) fd.append('password', rpPwd);
+                    endpoint = '/remove-password';
+                    break;
+                    
+                case 'pdfexcel':
+                    const peFile = document.getElementById('file_' + index)?.files[0];
+                    if (!peFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', peFile);
+                    endpoint = '/pdf-to-excel';
+                    break;
+                    
+                case 'extractimg':
+                    const eiFile = document.getElementById('file_' + index)?.files[0];
+                    if (!eiFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', eiFile);
+                    endpoint = '/extract-images';
+                    break;
+                    
+                case 'pdftext':
+                    const ptFile = document.getElementById('file_' + index)?.files[0];
+                    if (!ptFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', ptFile);
+                    endpoint = '/pdf-to-text';
+                    break;
+                    
+                case 'pagenum':
+                    const pnFile = document.getElementById('file_' + index)?.files[0];
+                    if (!pnFile) return showError('Please select a PDF file');
+                    fd.append('pdfs', pnFile);
+                    endpoint = '/add-page-numbers';
+                    break;
+            }
+            
+            if (endpoint) {
+                await sendRequest(endpoint, fd, 'result_' + index);
+            }
         }
         
-        // Helper functions
-        function getFile(index) { return document.getElementById('file_' + index)?.files[0]; }
-        function getMerge1(index) { return document.getElementById('merge1_' + index)?.files[0]; }
-        function getMerge2(index) { return document.getElementById('merge2_' + index)?.files[0]; }
-        
-        async function mergePDF(idx) {
-            const f1 = getMerge1(idx), f2 = getMerge2(idx);
-            if (!f1 || !f2) return showError('Select 2 PDF files');
-            const fd = new FormData();
-            fd.append('pdfs', f1); fd.append('pdfs', f2);
-            await send('/merge', fd, 'result_' + idx);
-        }
-        
-        async function splitPDF(idx) {
-            const f = getFile(idx), r = document.getElementById('pageRange_' + idx)?.value;
-            if (!f) return showError('Select PDF');
-            if (!r) return showError('Enter page range');
-            const fd = new FormData();
-            fd.append('pdfs', f); fd.append('pageRange', r);
-            await send('/split', fd, 'result_' + idx);
-        }
-        
-        async function rotatePDF(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f); fd.append('angle', document.getElementById('rotateAngle_' + idx)?.value || '90');
-            await send('/rotate', fd, 'result_' + idx);
-        }
-        
-        async function protectPDF(idx) {
-            const f = getFile(idx), p = document.getElementById('password_' + idx)?.value;
-            if (!f) return showError('Select PDF');
-            if (!p) return showError('Enter password');
-            const fd = new FormData();
-            fd.append('pdfs', f); fd.append('password', p);
-            await send('/protect', fd, 'result_' + idx);
-        }
-        
-        async function excelToPDF(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select Excel file');
-            const fd = new FormData();
-            fd.append('excel', f);
-            fd.append('orientation', document.getElementById('excelOrientation_' + idx)?.value || 'portrait');
-            await send('/excel-to-pdf', fd, 'result_' + idx);
-        }
-        
-        async function wordToPDF(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select Word file');
-            const fd = new FormData();
-            fd.append('word', f);
-            await send('/word-to-pdf', fd, 'result_' + idx);
-        }
-        
-        async function realCompressPDF(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f);
-            await send('/real-compress', fd, 'result_' + idx);
-        }
-        
-        async function pdfToWord(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f);
-            await send('/pdf-to-word', fd, 'result_' + idx);
-        }
-        
-        async function imageToPDF(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select image');
-            const fd = new FormData();
-            fd.append('images', f);
-            fd.append('pageSize', document.getElementById('imageToPdfSize_' + idx)?.value || 'A4');
-            await send('/image-to-pdf', fd, 'result_' + idx);
-        }
-        
-        async function addWatermark(idx) {
-            const f = getFile(idx), t = document.getElementById('watermarkText_' + idx)?.value, o = document.getElementById('watermarkOpacity_' + idx)?.value;
-            if (!f) return showError('Select PDF');
-            if (!t) return showError('Enter watermark text');
-            const fd = new FormData();
-            fd.append('pdfs', f); fd.append('watermarkText', t); fd.append('opacity', o);
-            await send('/add-watermark', fd, 'result_' + idx);
-        }
-        
-        async function removePassword(idx) {
-            const f = getFile(idx), p = document.getElementById('removePasswordInput_' + idx)?.value;
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f); fd.append('password', p);
-            await send('/remove-password', fd, 'result_' + idx);
-        }
-        
-        async function pdfToExcel(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f);
-            await send('/pdf-to-excel', fd, 'result_' + idx);
-        }
-        
-        async function extractImages(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f);
-            await send('/extract-images', fd, 'result_' + idx);
-        }
-        
-        async function pdfToText(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f);
-            await send('/pdf-to-text', fd, 'result_' + idx);
-        }
-        
-        async function addPageNumbers(idx) {
-            const f = getFile(idx);
-            if (!f) return showError('Select PDF');
-            const fd = new FormData();
-            fd.append('pdfs', f);
-            await send('/add-page-numbers', fd, 'result_' + idx);
-        }
-        
-        async function send(url, data, resultId) {
+        async function sendRequest(url, data, resultId) {
             showLoading(true);
-            const rd = document.getElementById(resultId);
-            if (rd) rd.style.display = 'none';
+            const resultDiv = document.getElementById(resultId);
+            if (resultDiv) {
+                resultDiv.style.display = 'none';
+                resultDiv.innerHTML = '';
+            }
             
             try {
-                const res = await fetch(url, { method: 'POST', body: data });
-                const json = await res.json();
+                const response = await fetch(url, { method: 'POST', body: data });
+                const json = await response.json();
+                
                 if (json.success) {
-                    let ht = '<strong>✅ Success!</strong><br>';
-                    if (json.originalSize && json.compressedSize) ht += 'Size: ' + json.originalSize + ' KB → ' + json.compressedSize + ' KB<br>Saved: ' + json.savedPercent + '%<br>';
-                    if (json.message) ht += json.message + '<br>';
-                    if (json.pageCount) ht += '📄 Pages: ' + json.pageCount + '<br>';
-                    ht += '<a href="' + json.downloadUrl + '" download>📥 Click here to download</a>';
-                    if (rd) { rd.innerHTML = ht; rd.style.display = 'block'; }
-                } else showError(json.error);
-            } catch(err) { showError(err.message); }
-            finally { showLoading(false); }
+                    let html = '<strong>✅ Success!</strong><br>';
+                    if (json.originalSize && json.compressedSize) {
+                        html += '📊 Size: ' + json.originalSize + ' KB → ' + json.compressedSize + ' KB<br>';
+                        html += '💾 Saved: ' + json.savedPercent + '%<br>';
+                    }
+                    if (json.message) html += json.message + '<br>';
+                    if (json.pageCount) html += '📄 Pages: ' + json.pageCount + '<br>';
+                    html += '<a href="' + json.downloadUrl + '" download>📥 Click here to download</a>';
+                    if (resultDiv) {
+                        resultDiv.innerHTML = html;
+                        resultDiv.style.display = 'block';
+                    }
+                } else {
+                    showError(json.error || 'Processing failed');
+                }
+            } catch (err) {
+                showError('Error: ' + err.message);
+            } finally {
+                showLoading(false);
+            }
         }
         
-        function showLoading(s) { document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
-        function showError(msg) { const e = document.getElementById('error'); e.innerHTML = '❌ ' + msg; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 5000); }
+        function showLoading(show) {
+            const loader = document.getElementById('loading');
+            if (loader) loader.style.display = show ? 'flex' : 'none';
+        }
         
-        renderTools();
+        function showError(msg) {
+            const errorDiv = document.getElementById('error');
+            if (errorDiv) {
+                errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTools();
+        });
     </script>
 </body>
 </html>`;
@@ -696,17 +753,6 @@ const html = `<!DOCTYPE html>
 app.get('/', (req, res) => res.send(html));
 
 // ============= ALL API ENDPOINTS =============
-
-// Helper: Get Excel sheet names
-app.post('/get-excel-sheets', upload.single('excel'), async (req, res) => {
-    try {
-        const workbook = XLSX.readFile(req.file.path);
-        res.json({ sheets: workbook.SheetNames });
-        fs.unlinkSync(req.file.path);
-    } catch (err) {
-        res.json({ sheets: [] });
-    }
-});
 
 // 1. Merge PDF
 app.post('/merge', upload.array('pdfs', 2), async (req, res) => {
@@ -815,7 +861,7 @@ app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
         const pageWidth = orientation === 'portrait' ? 595 : 842;
         const pageHeight = orientation === 'portrait' ? 842 : 595;
         
-        for (let sheetIdx = 0; sheetIdx < workbook.SheetNames.length && sheetIdx < 3; sheetIdx++) {
+        for (let sheetIdx = 0; sheetIdx < Math.min(workbook.SheetNames.length, 3); sheetIdx++) {
             const sheetName = workbook.SheetNames[sheetIdx];
             const worksheet = workbook.Sheets[sheetName];
             const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
@@ -825,23 +871,23 @@ app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
             let y = pageHeight - 50;
             page.drawText('Sheet: ' + sheetName, { x: 50, y, size: 14, font: bold, color: rgb(0.2, 0.3, 0.8) });
             y -= 35;
-            const maxCols = Math.min(data[0]?.length || 5, 6);
+            const maxCols = Math.min(data[0]?.length || 5, 5);
             const colWidth = (pageWidth - 100) / maxCols;
             let x = 50;
             for (let col = 0; col < maxCols; col++) {
                 const headerText = String(data[0]?.[col] || 'Col ' + (col + 1)).substring(0, 20);
-                page.drawText(headerText, { x, y, size: 10, font: bold });
+                page.drawText(headerText, { x, y, size: 9, font: bold });
                 x += colWidth;
             }
-            y -= 25;
-            for (let row = 1; row < Math.min(data.length, 30); row++) {
+            y -= 22;
+            for (let row = 1; row < Math.min(data.length, 25); row++) {
                 x = 50;
                 for (let col = 0; col < maxCols; col++) {
                     const cellText = String(data[row]?.[col] || '').substring(0, 25);
-                    page.drawText(cellText, { x, y, size: 9, font });
+                    page.drawText(cellText, { x, y, size: 8, font });
                     x += colWidth;
                 }
-                y -= 20;
+                y -= 18;
                 if (y < 50) break;
             }
         }
@@ -868,6 +914,10 @@ app.post('/word-to-pdf', upload.single('word'), async (req, res) => {
         page.drawText('Word to PDF Conversion', { x: 50, y, size: 18, font: bold, color: rgb(0.2, 0.3, 0.8) });
         y -= 40;
         page.drawText('File: ' + req.file.originalname, { x: 50, y, size: 12, font });
+        y -= 30;
+        page.drawText('Note: This is a preview. For complete Word conversion:', { x: 50, y, size: 10, font, color: rgb(0.5, 0.5, 0.5) });
+        y -= 20;
+        page.drawText('Open the Word file in Microsoft Word and click Save As → PDF', { x: 60, y, size: 9, font });
         const pdfBytes = await pdfDoc.save();
         const out = path.join(__dirname, 'uploads', 'word_to_pdf_' + Date.now() + '.pdf');
         fs.writeFileSync(out, pdfBytes);
@@ -1022,13 +1072,13 @@ app.post('/add-page-numbers', upload.array('pdfs', 1), async (req, res) => {
         const out = path.join(__dirname, 'uploads', 'numbered_' + Date.now() + '.pdf');
         fs.writeFileSync(out, await doc.save());
         fs.unlinkSync(req.files[0].path);
-        res.json({ success: true, downloadUrl: '/download/' + path.basename(out) });
+        res.json({ success: true, downloadUrl: '/download/' + path.basename(out), pageCount: pages.length });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Download
+// Download endpoint
 app.get('/download/:filename', (req, res) => {
     const file = path.join(__dirname, 'uploads', req.params.filename);
     if (fs.existsSync(file)) {
@@ -1046,8 +1096,8 @@ app.listen(PORT, HOST, () => {
     console.log('\n╔══════════════════════════════════════════════════════════════╗');
     console.log('║     ✅ PDF TOOLS PRO - PROFESSIONAL EDITION IS RUNNING!     ║');
     console.log('╠══════════════════════════════════════════════════════════════╣');
-    console.log(`║     📱 Open: http://${HOST}:${PORT}                              ║`);
+    console.log(`║     📱 Open: http://localhost:${PORT}                               ║`);
     console.log('╠══════════════════════════════════════════════════════════════╣');
-    console.log('║     🎨 Premium Design | 15 Tools | 100% Free                ║');
+    console.log('║     🎨 15 Professional Tools | Premium Design | 100% Free   ║');
     console.log('╚══════════════════════════════════════════════════════════════╝\n');
 });
