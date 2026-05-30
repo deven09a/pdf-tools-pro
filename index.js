@@ -1,3 +1,6 @@
+// LARGEPDF TOOLS - 10 PROFESSIONAL PDF TOOLS
+// Domain: largepdftools.com
+
 const express = require('express');
 const multer = require('multer');
 const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
@@ -6,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const upload = multer({ dest: 'uploads/', limits: { fileSize: 50 * 1024 * 1024 } });
+const upload = multer({ dest: 'uploads/' });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
@@ -59,7 +62,6 @@ const html = `<!DOCTYPE html>
         .tool-title { font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 8px; }
         .tool-desc { font-size: 0.8rem; color: #94a3b8; margin-bottom: 15px; }
         .badge { display: inline-block; background: #22c55e; padding: 3px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 600; color: white; margin-left: 8px; }
-        .badge-premium { background: linear-gradient(135deg, #f59e0b, #ef4444); }
         input, button {
             width: 100%;
             padding: 12px;
@@ -132,7 +134,7 @@ const html = `<!DOCTYPE html>
         
         <div class="grid" id="toolsGrid"></div>
         <div class="footer">
-            <p>© 2026 LargePDF Tools | Secure · Fast · Free | Made with <i class="fas fa-heart" style="color:#ef4444"></i> for everyone</p>
+            <p>© 2026 LargePDF Tools | Secure · Fast · Free</p>
         </div>
     </div>
     
