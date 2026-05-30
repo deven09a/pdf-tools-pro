@@ -10,38 +10,37 @@ const upload = multer({ dest: 'uploads/' });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
-// SIMPLE WORKING HTML - NO COMPLEX JAVASCRIPT ISSUES
+// SIMPLE, CLEAN HTML - NO JAVASCRIPT ERRORS
 const html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LargePDF Tools - 10 Free PDF Tools</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background: linear-gradient(135deg, #0f172a, #1e1b4b);
             min-height: 100vh;
             padding: 20px;
         }
         .container { max-width: 1200px; margin: 0 auto; }
         h1 { text-align: center; color: white; margin-bottom: 10px; }
-        .sub { text-align: center; color: #94a3b8; margin-bottom: 30px; }
-        .stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
+        .sub { text-align: center; color: #aaa; margin-bottom: 30px; }
+        .stats { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; flex-wrap: wrap; }
         .stat { text-align: center; }
         .stat-num { font-size: 28px; font-weight: bold; color: #a5b4fc; }
-        .stat-label { color: #64748b; font-size: 12px; }
+        .stat-label { color: #888; font-size: 12px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .card {
-            background: rgba(30, 27, 75, 0.6);
+            background: rgba(30, 27, 75, 0.7);
             border-radius: 16px;
             padding: 20px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         .card:hover { border-color: #6366f1; }
         .card h3 { color: white; margin-bottom: 8px; }
-        .card p { color: #94a3b8; font-size: 13px; margin-bottom: 15px; }
+        .card p { color: #aaa; font-size: 13px; margin-bottom: 15px; }
         .badge { background: #22c55e; font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-left: 8px; }
         input, button {
             width: 100%;
@@ -51,8 +50,8 @@ const html = `<!DOCTYPE html>
             border: none;
         }
         input {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
         }
         button {
@@ -61,11 +60,11 @@ const html = `<!DOCTYPE html>
             cursor: pointer;
             font-weight: bold;
         }
-        button:hover { opacity: 0.9; }
+        button:hover { opacity: 0.9; transform: scale(1.01); }
         .result {
             margin-top: 12px;
             padding: 10px;
-            background: rgba(99,102,241,0.15);
+            background: rgba(99,102,241,0.2);
             border-radius: 8px;
             display: none;
             font-size: 12px;
@@ -82,6 +81,7 @@ const html = `<!DOCTYPE html>
             border-radius: 40px;
             display: none;
             z-index: 1000;
+            transform: translate(-50%, -50%);
         }
         .error {
             position: fixed;
@@ -94,10 +94,10 @@ const html = `<!DOCTYPE html>
             display: none;
             z-index: 1000;
         }
-        .footer { text-align: center; margin-top: 40px; padding: 20px; color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); }
+        .footer { text-align: center; margin-top: 40px; padding: 20px; color: #666; border-top: 1px solid rgba(255,255,255,0.05); }
         @media (max-width: 768px) {
             .grid { grid-template-columns: 1fr; }
-            .stats { gap: 15px; }
+            .stats { gap: 20px; }
         }
     </style>
 </head>
@@ -116,40 +116,55 @@ const html = `<!DOCTYPE html>
         <div class="footer">© 2026 LargePDF Tools | Secure · Fast · Free</div>
     </div>
 
-    <div id="loading" class="loading">⏳ Processing...</div>
+    <div id="loading" class="loading">Processing...</div>
     <div id="error" class="error"></div>
 
     <script>
-        // Tool definitions
-        const toolsList = [
-            { id: "merge", name: "Merge PDF", icon: "🔗", desc: "Combine 2 PDF files into one document", inputs: 2 },
-            { id: "split", name: "Split PDF", icon: "✂️", desc: "Extract specific pages from your PDF", inputs: 1, hasText: true, placeholder: "Page range (1-5 or 1,3,5)" },
-            { id: "compress", name: "Compress PDF", icon: "🗜️", desc: "Reduce PDF file size", inputs: 1 },
-            { id: "excel", name: "Excel to PDF", icon: "📊", desc: "Convert Excel spreadsheets to PDF", inputs: 1, accept: ".xlsx,.xls" },
-            { id: "word", name: "Word to PDF", icon: "📝", desc: "Convert Word documents to PDF", inputs: 1, accept: ".doc,.docx" },
-            { id: "pdfimage", name: "PDF to Image", icon: "🖼️", desc: "Convert PDF pages to images", inputs: 1 },
-            { id: "imagepdf", name: "Image to PDF", icon: "📸", desc: "Convert images to PDF", inputs: 1, accept: ".jpg,.jpeg,.png" },
-            { id: "pdfword", name: "PDF to Word", icon: "📄", desc: "Extract text from PDF to Word", inputs: 1 },
-            { id: "pdfexcel", name: "PDF to Excel", icon: "📊", desc: "Extract PDF information to Excel", inputs: 1 },
-            { id: "pagenum", name: "Add Page Numbers", icon: "🔢", desc: "Add page numbers to your PDF", inputs: 1 }
+        // Tool data
+        var toolsData = [
+            {id:"merge", name:"Merge PDF", icon:"🔗", desc:"Combine 2 PDF files into one document", inputs:2, accept:".pdf", hasText:false, placeholder:""},
+            {id:"split", name:"Split PDF", icon:"✂️", desc:"Extract specific pages from your PDF", inputs:1, accept:".pdf", hasText:true, placeholder:"Page range (1-5 or 1,3,5)"},
+            {id:"compress", name:"Compress PDF", icon:"🗜️", desc:"Reduce PDF file size", inputs:1, accept:".pdf", hasText:false, placeholder:""},
+            {id:"excel", name:"Excel to PDF", icon:"📊", desc:"Convert Excel spreadsheets to PDF", inputs:1, accept:".xlsx,.xls", hasText:false, placeholder:""},
+            {id:"word", name:"Word to PDF", icon:"📝", desc:"Convert Word documents to PDF", inputs:1, accept:".doc,.docx", hasText:false, placeholder:""},
+            {id:"pdfimage", name:"PDF to Image", icon:"🖼️", desc:"Convert PDF pages to images", inputs:1, accept:".pdf", hasText:false, placeholder:""},
+            {id:"imagepdf", name:"Image to PDF", icon:"📸", desc:"Convert images to PDF", inputs:1, accept:".jpg,.jpeg,.png", hasText:false, placeholder:""},
+            {id:"pdfword", name:"PDF to Word", icon:"📄", desc:"Extract text from PDF to Word", inputs:1, accept:".pdf", hasText:false, placeholder:""},
+            {id:"pdfexcel", name:"PDF to Excel", icon:"📊", desc:"Extract PDF information to Excel", inputs:1, accept:".pdf", hasText:false, placeholder:""},
+            {id:"pagenum", name:"Add Page Numbers", icon:"🔢", desc:"Add page numbers to your PDF", inputs:1, accept:".pdf", hasText:false, placeholder:""}
         ];
 
-        // Render tools
+        // Show loading
+        function showLoading(show) {
+            var loader = document.getElementById('loading');
+            if(loader) loader.style.display = show ? 'block' : 'none';
+        }
+
+        // Show error
+        function showError(msg) {
+            var errDiv = document.getElementById('error');
+            if(errDiv) {
+                errDiv.innerHTML = '❌ ' + msg;
+                errDiv.style.display = 'block';
+                setTimeout(function() { errDiv.style.display = 'none'; }, 5000);
+            }
+        }
+
+        // Build tools grid
         function buildTools() {
-            const container = document.getElementById('toolsGrid');
-            if (!container) return;
+            var container = document.getElementById('toolsGrid');
+            if(!container) return;
             
-            let html = '';
-            for (let i = 0; i < toolsList.length; i++) {
-                const t = toolsList[i];
-                let fields = '';
+            var html = '';
+            for(var i = 0; i < toolsData.length; i++) {
+                var t = toolsData[i];
+                var fields = '';
                 
-                if (t.inputs === 2) {
-                    fields = '<input type="file" id="f1_' + i + '" accept=".pdf"><input type="file" id="f2_' + i + '" accept=".pdf">';
+                if(t.inputs === 2) {
+                    fields = '<input type="file" id="f1_' + i + '" accept="' + t.accept + '"><input type="file" id="f2_' + i + '" accept="' + t.accept + '">';
                 } else {
-                    let acceptFile = t.accept || '.pdf';
-                    fields = '<input type="file" id="f_' + i + '" accept="' + acceptFile + '">';
-                    if (t.hasText) {
+                    fields = '<input type="file" id="f_' + i + '" accept="' + t.accept + '">';
+                    if(t.hasText) {
                         fields += '<input type="text" id="txt_' + i + '" placeholder="' + t.placeholder + '">';
                     }
                 }
@@ -158,135 +173,120 @@ const html = `<!DOCTYPE html>
                 html += '<h3>' + t.icon + ' ' + t.name + '<span class="badge">FREE</span></h3>';
                 html += '<p>' + t.desc + '</p>';
                 html += fields;
-                html += '<button onclick="runTool(\'' + t.id + '\', ' + i + ')">Process</button>';
+                html += '<button onclick="runTool(\'' + t.id + '\',' + i + ')">Process</button>';
                 html += '<div id="res_' + i + '" class="result"></div>';
                 html += '</div>';
             }
             container.innerHTML = html;
         }
 
-        // Process tool
-        async function runTool(toolId, idx) {
-            const formData = new FormData();
-            let apiUrl = '';
+        // Run tool
+        function runTool(toolId, idx) {
+            var formData = new FormData();
+            var apiUrl = '';
 
-            if (toolId === 'merge') {
-                const file1 = document.getElementById('f1_' + idx).files[0];
-                const file2 = document.getElementById('f2_' + idx).files[0];
-                if (!file1 || !file2) return showError('Please select 2 PDF files');
-                formData.append('pdfs', file1);
-                formData.append('pdfs', file2);
+            if(toolId === 'merge') {
+                var f1 = document.getElementById('f1_' + idx).files[0];
+                var f2 = document.getElementById('f2_' + idx).files[0];
+                if(!f1 || !f2) { showError('Please select 2 PDF files'); return; }
+                formData.append('pdfs', f1);
+                formData.append('pdfs', f2);
                 apiUrl = '/merge';
             }
-            else if (toolId === 'split') {
-                const file = document.getElementById('f_' + idx).files[0];
-                const range = document.getElementById('txt_' + idx).value;
-                if (!file) return showError('Please select a PDF file');
-                if (!range) return showError('Please enter page range');
-                formData.append('pdfs', file);
-                formData.append('pageRange', range);
+            else if(toolId === 'split') {
+                var f = document.getElementById('f_' + idx).files[0];
+                var r = document.getElementById('txt_' + idx).value;
+                if(!f) { showError('Please select a PDF file'); return; }
+                if(!r) { showError('Please enter page range'); return; }
+                formData.append('pdfs', f);
+                formData.append('pageRange', r);
                 apiUrl = '/split';
             }
-            else if (toolId === 'compress') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select a PDF file');
-                formData.append('pdfs', file);
+            else if(toolId === 'compress') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select a PDF file'); return; }
+                formData.append('pdfs', f);
                 apiUrl = '/compress';
             }
-            else if (toolId === 'excel') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select an Excel file');
-                formData.append('excel', file);
+            else if(toolId === 'excel') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select an Excel file'); return; }
+                formData.append('excel', f);
                 apiUrl = '/excel-to-pdf';
             }
-            else if (toolId === 'word') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select a Word file');
-                formData.append('word', file);
+            else if(toolId === 'word') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select a Word file'); return; }
+                formData.append('word', f);
                 apiUrl = '/word-to-pdf';
             }
-            else if (toolId === 'pdfimage') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select a PDF file');
-                formData.append('pdfs', file);
+            else if(toolId === 'pdfimage') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select a PDF file'); return; }
+                formData.append('pdfs', f);
                 apiUrl = '/pdf-to-image';
             }
-            else if (toolId === 'imagepdf') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select an image file');
-                formData.append('images', file);
+            else if(toolId === 'imagepdf') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select an image file'); return; }
+                formData.append('images', f);
                 apiUrl = '/image-to-pdf';
             }
-            else if (toolId === 'pdfword') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select a PDF file');
-                formData.append('pdfs', file);
+            else if(toolId === 'pdfword') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select a PDF file'); return; }
+                formData.append('pdfs', f);
                 apiUrl = '/pdf-to-word';
             }
-            else if (toolId === 'pdfexcel') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select a PDF file');
-                formData.append('pdfs', file);
+            else if(toolId === 'pdfexcel') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select a PDF file'); return; }
+                formData.append('pdfs', f);
                 apiUrl = '/pdf-to-excel';
             }
-            else if (toolId === 'pagenum') {
-                const file = document.getElementById('f_' + idx).files[0];
-                if (!file) return showError('Please select a PDF file');
-                formData.append('pdfs', file);
+            else if(toolId === 'pagenum') {
+                var f = document.getElementById('f_' + idx).files[0];
+                if(!f) { showError('Please select a PDF file'); return; }
+                formData.append('pdfs', f);
                 apiUrl = '/add-page-numbers';
             }
 
-            if (apiUrl) {
-                await callApi(apiUrl, formData, 'res_' + idx);
+            if(apiUrl) {
+                sendRequest(apiUrl, formData, 'res_' + idx);
             }
         }
 
-        async function callApi(url, data, resultId) {
+        // Send request
+        function sendRequest(url, data, resultId) {
             showLoading(true);
-            const resultDiv = document.getElementById(resultId);
-            if (resultDiv) {
+            var resultDiv = document.getElementById(resultId);
+            if(resultDiv) {
                 resultDiv.style.display = 'none';
                 resultDiv.innerHTML = '';
             }
             
-            try {
-                const response = await fetch(url, { method: 'POST', body: data });
-                const result = await response.json();
-                
-                if (result.success) {
-                    let successHtml = '<strong>✅ Success!</strong><br>';
-                    if (result.originalSize && result.compressedSize) {
-                        successHtml += 'Size: ' + result.originalSize + ' KB → ' + result.compressedSize + ' KB<br>';
-                        successHtml += 'Saved: ' + result.savedPercent + '%<br>';
+            fetch(url, { method: 'POST', body: data })
+                .then(function(response) { return response.json(); })
+                .then(function(json) {
+                    if(json.success) {
+                        var html = '<strong>✅ Success!</strong><br>';
+                        if(json.originalSize && json.compressedSize) {
+                            html += 'Size: ' + json.originalSize + ' KB → ' + json.compressedSize + ' KB<br>';
+                            html += 'Saved: ' + json.savedPercent + '%<br>';
+                        }
+                        if(json.message) html += json.message + '<br>';
+                        if(json.pageCount) html += 'Pages: ' + json.pageCount + '<br>';
+                        html += '<a href="' + json.downloadUrl + '" download>📥 Download File</a>';
+                        if(resultDiv) {
+                            resultDiv.innerHTML = html;
+                            resultDiv.style.display = 'block';
+                        }
+                    } else {
+                        showError(json.error || 'Processing failed');
                     }
-                    if (result.message) successHtml += result.message + '<br>';
-                    if (result.pageCount) successHtml += 'Pages: ' + result.pageCount + '<br>';
-                    successHtml += '<a href="' + result.downloadUrl + '" download>📥 Download File</a>';
-                    if (resultDiv) {
-                        resultDiv.innerHTML = successHtml;
-                        resultDiv.style.display = 'block';
-                    }
-                } else {
-                    showError(result.error || 'Processing failed');
-                }
-            } catch (err) {
-                showError('Error: ' + err.message);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-        }
-
-        function showError(msg) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.innerHTML = '❌ ' + msg;
-            errorDiv.style.display = 'block';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+                })
+                .catch(function(err) { showError('Error: ' + err.message); })
+                .finally(function() { showLoading(false); });
         }
 
         // Start
@@ -512,7 +512,7 @@ app.get('/download/:filename', (req, res) => {
 // START SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log('\n✅ LargePDF Tools - 10 Tools Running on Free Tier');
+    console.log('\n✅ LargePDF Tools - 10 Tools Running');
     console.log('📱 Open: https://largepdftools.com');
-    console.log('🔧 All 10 tools are ready to use!\n');
+    console.log('🔧 All 10 tools are ready!\n');
 });
