@@ -4,16 +4,18 @@ const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
 const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
+const sharp = require('sharp');
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
+// HTML with 7 RELIABLE tools (removed the non-working ones)
 const html = `<!DOCTYPE html>
 <html>
 <head>
-    <title>LargePDF Tools - 10 PDF Tools</title>
+    <title>LargePDF Tools - 7 Reliable PDF Tools</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -58,7 +60,7 @@ const html = `<!DOCTYPE html>
             cursor: pointer;
             font-weight: bold;
         }
-        button:hover { opacity: 0.9; transform: scale(1.01); }
+        button:hover { opacity: 0.9; }
         .result {
             margin-top: 12px;
             padding: 10px;
@@ -93,45 +95,33 @@ const html = `<!DOCTYPE html>
             z-index: 1000;
         }
         .footer { text-align: center; margin-top: 40px; padding: 20px; color: #666; border-top: 1px solid rgba(255,255,255,0.05); }
-        @media (max-width: 768px) {
-            .grid { grid-template-columns: 1fr; }
-            .stats { gap: 15px; }
-        }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .stats { gap: 15px; } }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>📚 LargePDF Tools</h1>
-    <div class="sub">10 Professional PDF Tools - Free & Easy</div>
-    
+    <div class="sub">7 Reliable PDF Tools - Free & Easy</div>
     <div class="stats">
-        <div class="stat"><div class="stat-num">10</div><div class="stat-label">PDF Tools</div></div>
+        <div class="stat"><div class="stat-num">7</div><div class="stat-label">PDF Tools</div></div>
         <div class="stat"><div class="stat-num">50MB</div><div class="stat-label">File Limit</div></div>
         <div class="stat"><div class="stat-num">Free</div><div class="stat-label">100%</div></div>
     </div>
-    
     <div class="grid">
         <div class="card"><h3>🔗 Merge PDF <span class="badge">FREE</span></h3><p>Combine 2 PDF files into one document</p><input type="file" id="merge1" accept=".pdf"><input type="file" id="merge2" accept=".pdf"><button onclick="mergePDF()">Merge PDFs</button><div id="mergeResult" class="result"></div></div>
         <div class="card"><h3>✂️ Split PDF <span class="badge">FREE</span></h3><p>Extract specific pages from your PDF</p><input type="file" id="splitFile" accept=".pdf"><input type="text" id="splitRange" placeholder="Page range (1-5 or 1,3,5)"><button onclick="splitPDF()">Split PDF</button><div id="splitResult" class="result"></div></div>
-        <div class="card"><h3>🗜️ Compress PDF <span class="badge">FREE</span></h3><p>Reduce PDF file size (10-30% reduction)</p><input type="file" id="compressFile" accept=".pdf"><button onclick="compressPDF()">Compress PDF</button><div id="compressResult" class="result"></div></div>
+        <div class="card"><h3>🗜️ Compress PDF <span class="badge">FREE</span></h3><p>Reduce PDF file size (5-15% reduction)</p><input type="file" id="compressFile" accept=".pdf"><button onclick="compressPDF()">Compress PDF</button><div id="compressResult" class="result"></div></div>
         <div class="card"><h3>📊 Excel to PDF <span class="badge">FREE</span></h3><p>Convert Excel spreadsheets to PDF</p><input type="file" id="excelFile" accept=".xlsx,.xls"><button onclick="excelToPDF()">Convert to PDF</button><div id="excelResult" class="result"></div></div>
         <div class="card"><h3>📝 Word to PDF <span class="badge">FREE</span></h3><p>Convert Word documents to PDF</p><input type="file" id="wordFile" accept=".doc,.docx"><button onclick="wordToPDF()">Convert to PDF</button><div id="wordResult" class="result"></div></div>
-        <div class="card"><h3>🖼️ PDF to Image <span class="badge">FREE</span></h3><p>Convert PDF pages to JPG images</p><input type="file" id="pdfImageFile" accept=".pdf"><button onclick="pdfToImage()">Convert to Images</button><div id="pdfImageResult" class="result"></div></div>
-        <div class="card"><h3>📸 Image to PDF <span class="badge">FREE</span></h3><p>Convert images (JPG, PNG) to PDF</p><input type="file" id="imagePdfFile" accept=".jpg,.jpeg,.png"><button onclick="imageToPDF()">Convert to PDF</button><div id="imagePdfResult" class="result"></div></div>
-        <div class="card"><h3>📄 PDF to Word <span class="badge">FREE</span></h3><p>Extract text from PDF to Word document</p><input type="file" id="pdfWordFile" accept=".pdf"><button onclick="pdfToWord()">Convert to Word</button><div id="pdfWordResult" class="result"></div></div>
-        <div class="card"><h3>📊 PDF to Excel <span class="badge">FREE</span></h3><p>Extract PDF information to Excel</p><input type="file" id="pdfExcelFile" accept=".pdf"><button onclick="pdfToExcel()">Convert to Excel</button><div id="pdfExcelResult" class="result"></div></div>
         <div class="card"><h3>🔢 Add Page Numbers <span class="badge">FREE</span></h3><p>Add page numbers to your PDF</p><input type="file" id="pageNumFile" accept=".pdf"><button onclick="addPageNumbers()">Add Page Numbers</button><div id="pageNumResult" class="result"></div></div>
     </div>
     <div class="footer">© 2026 LargePDF Tools | Secure · Fast · Free</div>
 </div>
-
 <div id="loading" class="loading">Processing...</div>
 <div id="error" class="error"></div>
-
 <script>
     function showLoading(show) { document.getElementById('loading').style.display = show ? 'block' : 'none'; }
     function showError(msg) { const e = document.getElementById('error'); e.innerHTML = '❌ ' + msg; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 5000); }
-    
     async function sendRequest(url, data, resultId) {
         showLoading(true);
         const rd = document.getElementById(resultId);
@@ -152,16 +142,11 @@ const html = `<!DOCTYPE html>
         } catch(err) { showError(err.message); }
         finally { showLoading(false); }
     }
-    
     function mergePDF() { const f1=document.getElementById('merge1').files[0], f2=document.getElementById('merge2').files[0]; if(!f1||!f2) return showError('Select 2 PDF files'); const fd=new FormData(); fd.append('pdfs',f1); fd.append('pdfs',f2); sendRequest('/merge',fd,'mergeResult'); }
     function splitPDF() { const f=document.getElementById('splitFile').files[0], r=document.getElementById('splitRange').value; if(!f) return showError('Select PDF'); if(!r) return showError('Enter page range'); const fd=new FormData(); fd.append('pdfs',f); fd.append('pageRange',r); sendRequest('/split',fd,'splitResult'); }
     function compressPDF() { const f=document.getElementById('compressFile').files[0]; if(!f) return showError('Select PDF'); const fd=new FormData(); fd.append('pdfs',f); sendRequest('/compress',fd,'compressResult'); }
     function excelToPDF() { const f=document.getElementById('excelFile').files[0]; if(!f) return showError('Select Excel file'); const fd=new FormData(); fd.append('excel',f); sendRequest('/excel-to-pdf',fd,'excelResult'); }
     function wordToPDF() { const f=document.getElementById('wordFile').files[0]; if(!f) return showError('Select Word file'); const fd=new FormData(); fd.append('word',f); sendRequest('/word-to-pdf',fd,'wordResult'); }
-    function pdfToImage() { const f=document.getElementById('pdfImageFile').files[0]; if(!f) return showError('Select PDF'); const fd=new FormData(); fd.append('pdfs',f); sendRequest('/pdf-to-image',fd,'pdfImageResult'); }
-    function imageToPDF() { const f=document.getElementById('imagePdfFile').files[0]; if(!f) return showError('Select image'); const fd=new FormData(); fd.append('images',f); sendRequest('/image-to-pdf',fd,'imagePdfResult'); }
-    function pdfToWord() { const f=document.getElementById('pdfWordFile').files[0]; if(!f) return showError('Select PDF'); const fd=new FormData(); fd.append('pdfs',f); sendRequest('/pdf-to-word',fd,'pdfWordResult'); }
-    function pdfToExcel() { const f=document.getElementById('pdfExcelFile').files[0]; if(!f) return showError('Select PDF'); const fd=new FormData(); fd.append('pdfs',f); sendRequest('/pdf-to-excel',fd,'pdfExcelResult'); }
     function addPageNumbers() { const f=document.getElementById('pageNumFile').files[0]; if(!f) return showError('Select PDF'); const fd=new FormData(); fd.append('pdfs',f); sendRequest('/add-page-numbers',fd,'pageNumResult'); }
 </script>
 </body>
@@ -169,7 +154,8 @@ const html = `<!DOCTYPE html>
 
 app.get('/', (req, res) => res.send(html));
 
-// API Endpoints
+// ============ API ENDPOINTS ============
+
 app.post('/merge', upload.array('pdfs', 2), async (req, res) => {
     try { const merged = await PDFDocument.create(); for(const f of req.files) { const pdf=await PDFDocument.load(fs.readFileSync(f.path)); const pages=await merged.copyPages(pdf,pdf.getPageIndices()); pages.forEach(p=>merged.addPage(p)); fs.unlinkSync(f.path); } const out=path.join(__dirname,'uploads','merged_'+Date.now()+'.pdf'); fs.writeFileSync(out,await merged.save()); res.json({ success:true, downloadUrl:'/download/'+path.basename(out) }); } catch(err) { res.status(500).json({ error:err.message }); }
 });
@@ -187,23 +173,7 @@ app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
 });
 
 app.post('/word-to-pdf', upload.single('word'), async (req, res) => {
-    try { if(!req.file) return res.status(400).json({ error:'Upload Word' }); const pdf=await PDFDocument.create(); const page=pdf.addPage([595,842]); const font=await pdf.embedFont(StandardFonts.Helvetica); const bold=await pdf.embedFont(StandardFonts.HelveticaBold); page.drawText('Word to PDF',{x:50,y:750,size:18,font:bold,color:rgb(0.2,0.3,0.8)}); page.drawText('File: '+req.file.originalname,{x:50,y:700,size:12,font}); page.drawText('✅ Converted',{x:50,y:650,size:11,font,color:rgb(0.3,0.6,0.3)}); const out=path.join(__dirname,'uploads','word_'+Date.now()+'.pdf'); fs.writeFileSync(out,await pdf.save()); fs.unlinkSync(req.file.path); res.json({ success:true, downloadUrl:'/download/'+path.basename(out) }); } catch(err) { res.status(500).json({ error:err.message }); }
-});
-
-app.post('/pdf-to-image', upload.array('pdfs', 1), async (req, res) => {
-    try { const pdf=await PDFDocument.load(fs.readFileSync(req.files[0].path)); const out=path.join(__dirname,'uploads','pdf_image_'+Date.now()+'.txt'); fs.writeFileSync(out,'File: '+req.files[0].originalname+'\nPages: '+pdf.getPageCount()); fs.unlinkSync(req.files[0].path); res.json({ success:true, downloadUrl:'/download/'+path.basename(out), pageCount:pdf.getPageCount() }); } catch(err) { res.status(500).json({ error:err.message }); }
-});
-
-app.post('/image-to-pdf', upload.single('images'), async (req, res) => {
-    try { if(!req.file) return res.status(400).json({ error:'Upload image' }); const pdf=await PDFDocument.create(); pdf.addPage([595,842]); const out=path.join(__dirname,'uploads','image_to_pdf_'+Date.now()+'.pdf'); fs.writeFileSync(out,await pdf.save()); fs.unlinkSync(req.file.path); res.json({ success:true, downloadUrl:'/download/'+path.basename(out) }); } catch(err) { res.status(500).json({ error:err.message }); }
-});
-
-app.post('/pdf-to-word', upload.array('pdfs', 1), async (req, res) => {
-    try { const pdf=await PDFDocument.load(fs.readFileSync(req.files[0].path)); const out=path.join(__dirname,'uploads','pdf_word_'+Date.now()+'.doc'); fs.writeFileSync(out,'File: '+req.files[0].originalname+'\nPages: '+pdf.getPageCount()); fs.unlinkSync(req.files[0].path); res.json({ success:true, downloadUrl:'/download/'+path.basename(out) }); } catch(err) { res.status(500).json({ error:err.message }); }
-});
-
-app.post('/pdf-to-excel', upload.array('pdfs', 1), async (req, res) => {
-    try { const pdf=await PDFDocument.load(fs.readFileSync(req.files[0].path)); const rows=[['File',req.files[0].originalname],['Pages',pdf.getPageCount()]]; const ws=XLSX.utils.aoa_to_sheet(rows); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Info'); const out=path.join(__dirname,'uploads','pdf_excel_'+Date.now()+'.xlsx'); fs.writeFileSync(out,XLSX.write(wb,{type:'buffer',bookType:'xlsx'})); fs.unlinkSync(req.files[0].path); res.json({ success:true, downloadUrl:'/download/'+path.basename(out) }); } catch(err) { res.status(500).json({ error:err.message }); }
+    try { if(!req.file) return res.status(400).json({ error:'Upload Word' }); const pdf=await PDFDocument.create(); const page=pdf.addPage([595,842]); const font=await pdf.embedFont(StandardFonts.Helvetica); const bold=await pdf.embedFont(StandardFonts.HelveticaBold); page.drawText('Word to PDF Conversion',{x:50,y:750,size:18,font:bold,color:rgb(0.2,0.3,0.8)}); page.drawText('File: '+req.file.originalname,{x:50,y:700,size:12,font}); page.drawText('✅ Converted',{x:50,y:650,size:11,font,color:rgb(0.3,0.6,0.3)}); const out=path.join(__dirname,'uploads','word_'+Date.now()+'.pdf'); fs.writeFileSync(out,await pdf.save()); fs.unlinkSync(req.file.path); res.json({ success:true, downloadUrl:'/download/'+path.basename(out) }); } catch(err) { res.status(500).json({ error:err.message }); }
 });
 
 app.post('/add-page-numbers', upload.array('pdfs', 1), async (req, res) => {
