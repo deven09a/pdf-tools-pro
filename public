@@ -1,1 +1,216 @@
 public/index.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LargePDF Tools - 10 Free PDF Tools</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 10px; }
+        .sub { text-align: center; color: #aaa; margin-bottom: 30px; }
+        .stats { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-num { font-size: 28px; font-weight: bold; color: #a5b4fc; }
+        .stat-label { color: #888; font-size: 12px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card {
+            background: rgba(30, 27, 75, 0.7);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card:hover { border-color: #6366f1; }
+        .card h3 { color: white; margin-bottom: 8px; }
+        .card p { color: #aaa; font-size: 13px; margin-bottom: 15px; }
+        .badge { background: #22c55e; font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-left: 8px; }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: none;
+        }
+        input {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+        button {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { opacity: 0.9; }
+        .result {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(99,102,241,0.2);
+            border-radius: 8px;
+            display: none;
+            font-size: 12px;
+            border-left: 3px solid #6366f1;
+        }
+        .result a { color: #a5b4fc; }
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            background: black;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 40px;
+            display: none;
+            z-index: 1000;
+            transform: translate(-50%, -50%);
+        }
+        .error {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+        }
+        .footer { text-align: center; margin-top: 40px; padding: 20px; color: #666; border-top: 1px solid rgba(255,255,255,0.05); }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .stats { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 LargePDF Tools</h1>
+        <div class="sub">10 Professional PDF Tools - Free & Easy</div>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-num">10</div><div class="stat-label">PDF Tools</div></div>
+            <div class="stat"><div class="stat-num">50MB</div><div class="stat-label">File Limit</div></div>
+            <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free</div></div>
+        </div>
+
+        <div class="grid" id="toolsGrid"></div>
+        <div class="footer">© 2026 LargePDF Tools | Secure · Fast · Free</div>
+    </div>
+
+    <div id="loading" class="loading">Processing...</div>
+    <div id="error" class="error"></div>
+
+    <script>
+        var toolsData = [
+            {id:"merge", name:"Merge PDF", icon:"🔗", desc:"Combine 2 PDF files into one", inputs:2, accept:".pdf"},
+            {id:"split", name:"Split PDF", icon:"✂️", desc:"Extract specific pages", inputs:1, accept:".pdf", hasText:true, placeholder:"Page range (1-5 or 1,3,5)"},
+            {id:"compress", name:"Compress PDF", icon:"🗜️", desc:"Reduce file size", inputs:1, accept:".pdf"},
+            {id:"excel", name:"Excel to PDF", icon:"📊", desc:"Convert Excel to PDF", inputs:1, accept:".xlsx,.xls"},
+            {id:"word", name:"Word to PDF", icon:"📝", desc:"Convert Word to PDF", inputs:1, accept:".doc,.docx"},
+            {id:"pdfimage", name:"PDF to Image", icon:"🖼️", desc:"Convert PDF to images", inputs:1, accept:".pdf"},
+            {id:"imagepdf", name:"Image to PDF", icon:"📸", desc:"Convert images to PDF", inputs:1, accept:".jpg,.jpeg,.png"},
+            {id:"pdfword", name:"PDF to Word", icon:"📄", desc:"Extract text to Word", inputs:1, accept:".pdf"},
+            {id:"pdfexcel", name:"PDF to Excel", icon:"📊", desc:"Extract info to Excel", inputs:1, accept:".pdf"},
+            {id:"pagenum", name:"Add Page Numbers", icon:"🔢", desc:"Add page numbers", inputs:1, accept:".pdf"}
+        ];
+
+        function buildTools() {
+            var container = document.getElementById('toolsGrid');
+            if(!container) return;
+            var html = '';
+            for(var i=0; i<toolsData.length; i++) {
+                var t = toolsData[i];
+                var fields = '';
+                if(t.inputs === 2) {
+                    fields = '<input type="file" id="f1_'+i+'" accept="'+t.accept+'"><input type="file" id="f2_'+i+'" accept="'+t.accept+'">';
+                } else {
+                    fields = '<input type="file" id="f_'+i+'" accept="'+t.accept+'">';
+                    if(t.hasText) fields += '<input type="text" id="txt_'+i+'" placeholder="'+t.placeholder+'">';
+                }
+                html += '<div class="card"><h3>'+t.icon+' '+t.name+'<span class="badge">FREE</span></h3><p>'+t.desc+'</p>'+fields+'<button onclick="runTool(\''+t.id+'\','+i+')">Process</button><div id="res_'+i+'" class="result"></div></div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function showLoading(show) { var l=document.getElementById('loading'); if(l) l.style.display=show?'block':'none'; }
+        function showError(msg) { var e=document.getElementById('error'); if(e){ e.innerHTML='❌ '+msg; e.style.display='block'; setTimeout(function(){ e.style.display='none'; },5000); } }
+
+        function runTool(toolId, idx) {
+            var fd = new FormData();
+            var url = '';
+            if(toolId==='merge') {
+                var f1=document.getElementById('f1_'+idx).files[0], f2=document.getElementById('f2_'+idx).files[0];
+                if(!f1||!f2) { showError('Select 2 PDF files'); return; }
+                fd.append('pdfs',f1); fd.append('pdfs',f2); url='/merge';
+            } else if(toolId==='split') {
+                var f=document.getElementById('f_'+idx).files[0], r=document.getElementById('txt_'+idx).value;
+                if(!f) { showError('Select PDF'); return; }
+                if(!r) { showError('Enter page range'); return; }
+                fd.append('pdfs',f); fd.append('pageRange',r); url='/split';
+            } else if(toolId==='compress') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select PDF'); return; }
+                fd.append('pdfs',f); url='/compress';
+            } else if(toolId==='excel') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select Excel'); return; }
+                fd.append('excel',f); url='/excel-to-pdf';
+            } else if(toolId==='word') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select Word'); return; }
+                fd.append('word',f); url='/word-to-pdf';
+            } else if(toolId==='pdfimage') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select PDF'); return; }
+                fd.append('pdfs',f); url='/pdf-to-image';
+            } else if(toolId==='imagepdf') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select image'); return; }
+                fd.append('images',f); url='/image-to-pdf';
+            } else if(toolId==='pdfword') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select PDF'); return; }
+                fd.append('pdfs',f); url='/pdf-to-word';
+            } else if(toolId==='pdfexcel') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select PDF'); return; }
+                fd.append('pdfs',f); url='/pdf-to-excel';
+            } else if(toolId==='pagenum') {
+                var f=document.getElementById('f_'+idx).files[0];
+                if(!f) { showError('Select PDF'); return; }
+                fd.append('pdfs',f); url='/add-page-numbers';
+            }
+            if(url) sendRequest(url, fd, 'res_'+idx);
+        }
+
+        function sendRequest(url, data, resultId) {
+            showLoading(true);
+            var rd = document.getElementById(resultId);
+            if(rd) { rd.style.display='none'; rd.innerHTML=''; }
+            fetch(url, { method:'POST', body:data })
+                .then(function(res){ return res.json(); })
+                .then(function(json){
+                    if(json.success) {
+                        var h='<b>✅ Success!</b><br>';
+                        if(json.originalSize && json.compressedSize) h+='Size: '+json.originalSize+' KB → '+json.compressedSize+' KB<br>Saved: '+json.savedPercent+'%<br>';
+                        if(json.message) h+=json.message+'<br>';
+                        if(json.pageCount) h+='Pages: '+json.pageCount+'<br>';
+                        h+='<a href="'+json.downloadUrl+'" download>📥 Download</a>';
+                        if(rd) { rd.innerHTML=h; rd.style.display='block'; }
+                    } else { showError(json.error); }
+                })
+                .catch(function(err){ showError(err.message); })
+                .finally(function(){ showLoading(false); });
+        }
+        buildTools();
+    </script>
+</body>
+</html>
