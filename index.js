@@ -1,6 +1,3 @@
-// LARGEPDF TOOLS - 10 PROFESSIONAL PDF TOOLS
-// Domain: largepdftools.com
-
 const express = require('express');
 const multer = require('multer');
 const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
@@ -9,13 +6,13 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 50 * 1024 * 1024 } });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
-// HTML with 10 tools
+// Professional HTML with 10 tools
 const html = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +35,7 @@ const html = `<!DOCTYPE html>
         .stat { text-align: center; }
         .stat-number { font-size: 2rem; font-weight: 800; color: #a5b4fc; }
         .stat-label { color: #64748b; font-size: 0.85rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
         .tool-card {
             background: rgba(30, 27, 75, 0.6);
             backdrop-filter: blur(10px);
@@ -62,6 +59,7 @@ const html = `<!DOCTYPE html>
         .tool-title { font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 8px; }
         .tool-desc { font-size: 0.8rem; color: #94a3b8; margin-bottom: 15px; }
         .badge { display: inline-block; background: #22c55e; padding: 3px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 600; color: white; margin-left: 8px; }
+        .badge-premium { background: linear-gradient(135deg, #f59e0b, #ef4444); }
         input, button {
             width: 100%;
             padding: 12px;
@@ -134,7 +132,7 @@ const html = `<!DOCTYPE html>
         
         <div class="grid" id="toolsGrid"></div>
         <div class="footer">
-            <p>© 2026 LargePDF Tools | Secure · Fast · Free</p>
+            <p>© 2026 LargePDF Tools | Secure · Fast · Free | Made with <i class="fas fa-heart" style="color:#ef4444"></i> for everyone</p>
         </div>
     </div>
     
@@ -144,15 +142,15 @@ const html = `<!DOCTYPE html>
     <script>
         const tools = [
             { id: "merge", name: "Merge PDF", icon: "fa-compress-alt", desc: "Combine 2 PDF files into one", inputs: 2 },
-            { id: "split", name: "Split PDF", icon: "fa-cut", desc: "Extract specific pages", inputs: 1, hasText: true, placeholder: "Page range (1-5 or 1,3,5)" },
-            { id: "compress", name: "Compress PDF", icon: "fa-file-zipper", desc: "Reduce file size", inputs: 1 },
-            { id: "excel", name: "Excel to PDF", icon: "fa-file-excel", desc: "Convert Excel to PDF", inputs: 1, accept: ".xlsx,.xls" },
-            { id: "word", name: "Word to PDF", icon: "fa-file-word", desc: "Convert Word to PDF", inputs: 1, accept: ".doc,.docx" },
-            { id: "pdfimage", name: "PDF to Image", icon: "fa-image", desc: "Convert PDF to images", inputs: 1 },
+            { id: "split", name: "Split PDF", icon: "fa-cut", desc: "Extract specific pages from your PDF", inputs: 1, hasText: true, placeholder: "Page range (1-5 or 1,3,5)" },
+            { id: "compress", name: "Compress PDF", icon: "fa-file-zipper", desc: "Reduce PDF file size (10-30% reduction)", inputs: 1 },
+            { id: "excel", name: "Excel to PDF", icon: "fa-file-excel", desc: "Convert Excel spreadsheets to PDF", inputs: 1, accept: ".xlsx,.xls" },
+            { id: "word", name: "Word to PDF", icon: "fa-file-word", desc: "Convert Word documents to PDF", inputs: 1, accept: ".doc,.docx" },
+            { id: "pdfimage", name: "PDF to Image", icon: "fa-image", desc: "Convert PDF pages to JPG images", inputs: 1 },
             { id: "imagepdf", name: "Image to PDF", icon: "fa-images", desc: "Convert images to PDF", inputs: 1, accept: ".jpg,.jpeg,.png" },
-            { id: "pdfword", name: "PDF to Word", icon: "fa-file-word", desc: "Extract text to Word", inputs: 1 },
-            { id: "pdfexcel", name: "PDF to Excel", icon: "fa-file-excel", desc: "Extract info to Excel", inputs: 1 },
-            { id: "pagenum", name: "Add Page Numbers", icon: "fa-hashtag", desc: "Add page numbers", inputs: 1 }
+            { id: "pdfword", name: "PDF to Word", icon: "fa-file-word", desc: "Extract text from PDF to Word", inputs: 1 },
+            { id: "pdfexcel", name: "PDF to Excel", icon: "fa-file-excel", desc: "Extract PDF information to Excel", inputs: 1 },
+            { id: "pagenum", name: "Add Page Numbers", icon: "fa-hashtag", desc: "Add page numbers to your PDF", inputs: 1 }
         ];
         
         function renderTools() {
@@ -181,56 +179,56 @@ const html = `<!DOCTYPE html>
             if (toolId === 'merge') {
                 const f1 = document.getElementById('file1_' + idx)?.files[0];
                 const f2 = document.getElementById('file2_' + idx)?.files[0];
-                if (!f1 || !f2) return showError('Select 2 PDF files');
+                if (!f1 || !f2) return showError('Please select 2 PDF files');
                 fd.append('pdfs', f1);
                 fd.append('pdfs', f2);
                 endpoint = '/merge';
             } else if (toolId === 'split') {
                 const f = document.getElementById('file_' + idx)?.files[0];
                 const r = document.getElementById('text_' + idx)?.value;
-                if (!f) return showError('Select PDF');
-                if (!r) return showError('Enter page range');
+                if (!f) return showError('Please select a PDF file');
+                if (!r) return showError('Please enter page range');
                 fd.append('pdfs', f);
                 fd.append('pageRange', r);
                 endpoint = '/split';
             } else if (toolId === 'compress') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select PDF');
+                if (!f) return showError('Please select a PDF file');
                 fd.append('pdfs', f);
                 endpoint = '/compress';
             } else if (toolId === 'excel') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select Excel file');
+                if (!f) return showError('Please select an Excel file');
                 fd.append('excel', f);
                 endpoint = '/excel-to-pdf';
             } else if (toolId === 'word') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select Word file');
+                if (!f) return showError('Please select a Word file');
                 fd.append('word', f);
                 endpoint = '/word-to-pdf';
             } else if (toolId === 'pdfimage') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select PDF');
+                if (!f) return showError('Please select a PDF file');
                 fd.append('pdfs', f);
                 endpoint = '/pdf-to-image';
             } else if (toolId === 'imagepdf') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select image');
+                if (!f) return showError('Please select an image file');
                 fd.append('images', f);
                 endpoint = '/image-to-pdf';
             } else if (toolId === 'pdfword') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select PDF');
+                if (!f) return showError('Please select a PDF file');
                 fd.append('pdfs', f);
                 endpoint = '/pdf-to-word';
             } else if (toolId === 'pdfexcel') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select PDF');
+                if (!f) return showError('Please select a PDF file');
                 fd.append('pdfs', f);
                 endpoint = '/pdf-to-excel';
             } else if (toolId === 'pagenum') {
                 const f = document.getElementById('file_' + idx)?.files[0];
-                if (!f) return showError('Select PDF');
+                if (!f) return showError('Please select a PDF file');
                 fd.append('pdfs', f);
                 endpoint = '/add-page-numbers';
             }
@@ -267,7 +265,7 @@ const html = `<!DOCTYPE html>
 
 app.get('/', (req, res) => res.send(html));
 
-// ============ API ENDPOINTS ============
+// ============ API ENDPOINTS - 10 TOOLS ============
 
 // 1. MERGE PDF
 app.post('/merge', upload.array('pdfs', 2), async (req, res) => {
@@ -335,7 +333,7 @@ app.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
         const pdf = await PDFDocument.create();
         const font = await pdf.embedFont(StandardFonts.Helvetica);
         const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-        for (let s = 0; s < Math.min(wb.SheetNames.length, 3); s++) {
+        for (let s = 0; s < Math.min(wb.SheetNames.length, 2); s++) {
             const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[s]], { header: 1, defval: "" });
             if (!data || data.length === 0) continue;
             const page = pdf.addPage([595, 842]);
