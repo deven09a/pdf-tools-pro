@@ -1,3 +1,4 @@
+cat > /var/www/largepdf-tools/index.js << 'EOF'
 const express = require('express');
 const multer = require('multer');
 const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
@@ -9,12 +10,88 @@ const util = require('util');
 const execPromise = util.promisify(exec);
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 100 * 1024 * 1024 } });
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
-// SIMPLE HTML - NO SYNTAX ERRORS
-const html = '<!DOCTYPE html>\n<html>\n<head>\n<title>LargePDF Tools</title>\n<style>\n*{margin:0;padding:0;box-sizing:border-box}\nbody{font-family:Arial;background:linear-gradient(135deg,#0f172a,#1e1b4b);min-height:100vh;padding:20px}\n.container{max-width:1200px;margin:0 auto}\nh1{text-align:center;color:white}\n.sub{text-align:center;color:#aaa;margin-bottom:20px}\n.stats{display:flex;justify-content:center;gap:30px;margin-bottom:30px}\n.stat{text-align:center;color:white}\n.stat-num{font-size:24px;font-weight:bold;color:#a5b4fc}\n.stat-label{font-size:12px;color:#aaa}\n.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}\n.card{background:rgba(30,27,75,0.7);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.1)}\n.card:hover{border-color:#6366f1}\n.card h3{color:white;margin-bottom:8px}\n.card p{color:#aaa;font-size:13px;margin-bottom:15px}\n.badge{background:#22c55e;font-size:10px;padding:2px 8px;border-radius:20px;margin-left:8px}\ninput,select,button{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none}\ninput,select{background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.2);color:white}\nbutton{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;cursor:pointer;font-weight:bold}\nbutton:hover{opacity:0.9}\n.result{margin-top:12px;padding:10px;background:rgba(99,102,241,0.2);border-radius:6px;display:none;font-size:12px;border-left:3px solid #6366f1}\n.result a{color:#a5b4fc}\n.loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:black;color:white;padding:15px 30px;border-radius:40px;display:none;z-index:1000}\n.error{position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;padding:10px 15px;border-radius:6px;display:none;z-index:1000}\n.footer{text-align:center;margin-top:40px;padding:20px;color:#666}\n</style>\n</head>\n<body>\n<div class="container">\n<h1>📚 LargePDF Tools</h1>\n<div class="sub">10 Professional PDF Tools - Free</div>\n<div class="stats">\n<div class="stat"><div class="stat-num">10</div><div class="stat-label">Tools</div></div>\n<div class="stat"><div class="stat-num">100MB</div><div class="stat-label">Limit</div></div>\n<div class="stat"><div class="stat-num">90%</div><div class="stat-label">Compression</div></div>\n</div>\n<div class="grid">\n<div class="card"><h3>🔗 Merge PDF <span class="badge">FREE</span></h3><p>Combine 2 PDF files into one</p><input type="file" id="merge1" accept=".pdf"><input type="file" id="merge2" accept=".pdf"><button onclick="mergePDF()">Merge PDFs</button><div id="mergeResult" class="result"></div></div>\n<div class="card"><h3>✂️ Split PDF <span class="badge">FREE</span></h3><p>Extract specific pages</p><input type="file" id="splitFile" accept=".pdf"><input type="text" id="splitRange" placeholder="Page range (1-5 or 1,3,5)"><button onclick="splitPDF()">Split PDF</button><div id="splitResult" class="result"></div></div>\n<div class="card"><h3>🗜️ Compress PDF <span class="badge">FREE</span></h3><p>Reduce size up to 90%</p><input type="file" id="compressFile" accept=".pdf"><select id="compressLevel"><option value="screen">Maximum (80-90%)</option><option value="ebook" selected>Recommended (50-70%)</option><option value="printer">Light (30-50%)</option></select><button onclick="compressPDF()">Compress PDF</button><div id="compressResult" class="result"></div></div>\n<div class="card"><h3>📊 Excel to PDF <span class="badge">FREE</span></h3><p>Convert Excel spreadsheets to PDF</p><input type="file" id="excelFile" accept=".xlsx,.xls"><button onclick="excelToPDF()">Convert to PDF</button><div id="excelResult" class="result"></div></div>\n<div class="card"><h3>📝 Word to PDF <span class="badge">FREE</span></h3><p>Convert Word documents to PDF</p><input type="file" id="wordFile" accept=".doc,.docx"><button onclick="wordToPDF()">Convert to PDF</button><div id="wordResult" class="result"></div></div>\n<div class="card"><h3>🖼️ PDF to Image <span class="badge">FREE</span></h3><p>Convert PDF pages to images</p><input type="file" id="pdfImageFile" accept=".pdf"><button onclick="pdfToImage()">Convert to Images</button><div id="pdfImageResult" class="result"></div></div>\n<div class="card"><h3>📸 Image to PDF <span class="badge">FREE</span></h3><p>Convert images to PDF</p><input type="file" id="imagePdfFile" accept=".jpg,.jpeg,.png"><button onclick="imageToPDF()">Convert to PDF</button><div id="imagePdfResult" class="result"></div></div>\n<div class="card"><h3>📄 PDF to Word <span class="badge">FREE</span></h3><p>Extract text to Word document</p><input type="file" id="pdfWordFile" accept=".pdf"><button onclick="pdfToWord()">Convert to Word</button><div id="pdfWordResult" class="result"></div></div>\n<div class="card"><h3>📊 PDF to Excel <span class="badge">FREE</span></h3><p>Extract PDF info to Excel</p><input type="file" id="pdfExcelFile" accept=".pdf"><button onclick="pdfToExcel()">Convert to Excel</button><div id="pdfExcelResult" class="result"></div></div>\n<div class="card"><h3>🔢 Add Page Numbers <span class="badge">FREE</span></h3><p>Add page numbers to PDF</p><input type="file" id="pageNumFile" accept=".pdf"><button onclick="addPageNumbers()">Add Numbers</button><div id="pageNumResult" class="result"></div></div>\n</div>\n<div class="footer">© 2026 LargePDF Tools | Ghostscript 90% Compression</div>\n</div>\n<div id="loading" class="loading">Processing...</div>\n<div id="error" class="error"></div>\n<script>\nfunction showLoading(s){var l=document.getElementById("loading");if(l)l.style.display=s?"block":"none";}\nfunction showError(m){var e=document.getElementById("error");e.innerHTML="❌ "+m;e.style.display="block";setTimeout(function(){e.style.display="none";},5000);}\nasync function sendRequest(url,data,rid){showLoading(true);var rd=document.getElementById(rid);rd.style.display="none";rd.innerHTML="";try{var res=await fetch(url,{method:"POST",body:data});var json=await res.json();if(json.success){var h="<b>✅ Success!</b><br>";if(json.originalSize&&json.compressedSize)h+="Size: "+json.originalSize+" KB → "+json.compressedSize+" KB<br>Saved: "+json.savedPercent+"%<br>";if(json.message)h+=json.message+"<br>";if(json.pageCount)h+="Pages: "+json.pageCount+"<br>";h+="<a href=\""+json.downloadUrl+"\" download>📥 Download</a>";rd.innerHTML=h;rd.style.display="block";}else{showError(json.error);}}catch(err){showError(err.message);}finally{showLoading(false);}}\nfunction mergePDF(){var f1=document.getElementById("merge1").files[0];var f2=document.getElementById("merge2").files[0];if(!f1||!f2)return showError("Select 2 PDF files");var fd=new FormData();fd.append("pdfs",f1);fd.append("pdfs",f2);sendRequest("/merge",fd,"mergeResult");}\nfunction splitPDF(){var f=document.getElementById("splitFile").files[0];var r=document.getElementById("splitRange").value;if(!f)return showError("Select PDF");if(!r)return showError("Enter page range");var fd=new FormData();fd.append("pdfs",f);fd.append("pageRange",r);sendRequest("/split",fd,"splitResult");}\nfunction compressPDF(){var f=document.getElementById("compressFile").files[0];var l=document.getElementById("compressLevel").value;if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);fd.append("compressLevel",l);sendRequest("/compress",fd,"compressResult");}\nfunction excelToPDF(){var f=document.getElementById("excelFile").files[0];if(!f)return showError("Select Excel");var fd=new FormData();fd.append("excel",f);sendRequest("/excel-to-pdf",fd,"excelResult");}\nfunction wordToPDF(){var f=document.getElementById("wordFile").files[0];if(!f)return showError("Select Word");var fd=new FormData();fd.append("word",f);sendRequest("/word-to-pdf",fd,"wordResult");}\nfunction pdfToImage(){var f=document.getElementById("pdfImageFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/pdf-to-image",fd,"pdfImageResult");}\nfunction imageToPDF(){var f=document.getElementById("imagePdfFile").files[0];if(!f)return showError("Select image");var fd=new FormData();fd.append("images",f);sendRequest("/image-to-pdf",fd,"imagePdfResult");}\nfunction pdfToWord(){var f=document.getElementById("pdfWordFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/pdf-to-word",fd,"pdfWordResult");}\nfunction pdfToExcel(){var f=document.getElementById("pdfExcelFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/pdf-to-excel",fd,"pdfExcelResult");}\nfunction addPageNumbers(){var f=document.getElementById("pageNumFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/add-page-numbers",fd,"pageNumResult");}\n</script>\n</body>\n</html>';
+const html = `<!DOCTYPE html>
+<html>
+<head>
+<title>LargePDF Tools - 10 High-Traffic PDF Tools</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Free PDF tools: merge, split, compress, convert PDF to Word, Excel, JPG, and more. 90% compression with Ghostscript.">
+<meta name="keywords" content="PDF tools, merge PDF, split PDF, compress PDF, PDF to Word, PDF to Excel, PDF to JPG">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial;background:linear-gradient(135deg,#0f172a,#1e1b4b);min-height:100vh;padding:20px}
+.container{max-width:1200px;margin:0 auto}
+h1{text-align:center;color:white;font-size:2rem}
+.sub{text-align:center;color:#aaa;margin-bottom:20px}
+.stats{display:flex;justify-content:center;gap:30px;margin-bottom:30px;flex-wrap:wrap}
+.stat{text-align:center;color:white}
+.stat-num{font-size:28px;font-weight:bold;color:#a5b4fc}
+.stat-label{font-size:12px;color:#aaa}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.card{background:rgba(30,27,75,0.7);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.1);transition:all 0.3s}
+.card:hover{border-color:#6366f1;transform:translateY(-3px)}
+.card h3{color:white;margin-bottom:8px;font-size:1.2rem}
+.card p{color:#aaa;font-size:13px;margin-bottom:15px}
+.badge{background:#22c55e;font-size:10px;padding:2px 8px;border-radius:20px;margin-left:8px}
+.badge-hot{background:#ef4444}
+input,select,button{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none}
+input,select{background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.2);color:white}
+button{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;cursor:pointer;font-weight:bold}
+button:hover{opacity:0.9}
+.result{margin-top:12px;padding:10px;background:rgba(99,102,241,0.2);border-radius:6px;display:none;font-size:12px;border-left:3px solid #6366f1}
+.result a{color:#a5b4fc}
+.loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:black;color:white;padding:15px 30px;border-radius:40px;display:none;z-index:1000}
+.error{position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;padding:10px 15px;border-radius:6px;display:none;z-index:1000}
+.footer{text-align:center;margin-top:40px;padding:20px;color:#666}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📚 LargePDF Tools</h1>
+<div class="sub">10 High-Traffic PDF Tools - Free & Powerful</div>
+<div class="stats">
+<div class="stat"><div class="stat-num">10</div><div class="stat-label">Tools</div></div>
+<div class="stat"><div class="stat-num">100MB</div><div class="stat-label">File Limit</div></div>
+<div class="stat"><div class="stat-num">90%</div><div class="stat-label">Compression</div></div>
+</div>
+<div class="grid">
+<div class="card"><h3>🔗 Merge PDF <span class="badge">FREE</span></h3><p>Combine 2 PDF files into one</p><input type="file" id="merge1" accept=".pdf"><input type="file" id="merge2" accept=".pdf"><button onclick="mergePDF()">Merge PDFs</button><div id="mergeResult" class="result"></div></div>
+<div class="card"><h3>✂️ Split PDF <span class="badge">FREE</span></h3><p>Extract specific pages</p><input type="file" id="splitFile" accept=".pdf"><input type="text" id="splitRange" placeholder="Page range (1-5 or 1,3,5)"><button onclick="splitPDF()">Split PDF</button><div id="splitResult" class="result"></div></div>
+<div class="card"><h3>🗜️ Compress PDF <span class="badge badge-hot">HOT</span></h3><p>Reduce size up to 90% with Ghostscript</p><input type="file" id="compressFile" accept=".pdf"><select id="compressLevel"><option value="screen">Maximum (80-90%)</option><option value="ebook" selected>Recommended (50-70%)</option><option value="printer">Light (30-50%)</option></select><button onclick="compressPDF()">Compress PDF</button><div id="compressResult" class="result"></div></div>
+<div class="card"><h3>📊 Excel to PDF <span class="badge">FREE</span></h3><p>Convert Excel spreadsheets to PDF</p><input type="file" id="excelFile" accept=".xlsx,.xls"><button onclick="excelToPDF()">Convert to PDF</button><div id="excelResult" class="result"></div></div>
+<div class="card"><h3>📝 Word to PDF <span class="badge">FREE</span></h3><p>Convert Word documents to PDF</p><input type="file" id="wordFile" accept=".doc,.docx"><button onclick="wordToPDF()">Convert to PDF</button><div id="wordResult" class="result"></div></div>
+<div class="card"><h3>🖼️ PDF to Image <span class="badge badge-hot">HOT</span></h3><p>Convert PDF pages to JPG images</p><input type="file" id="pdfImageFile" accept=".pdf"><button onclick="pdfToImage()">Convert to Images</button><div id="pdfImageResult" class="result"></div></div>
+<div class="card"><h3>📸 Image to PDF <span class="badge badge-hot">HOT</span></h3><p>Convert images (JPG, PNG) to PDF</p><input type="file" id="imagePdfFile" accept=".jpg,.jpeg,.png"><button onclick="imageToPDF()">Convert to PDF</button><div id="imagePdfResult" class="result"></div></div>
+<div class="card"><h3>📄 PDF to Word <span class="badge badge-hot">HOT</span></h3><p>Extract text to Word document</p><input type="file" id="pdfWordFile" accept=".pdf"><button onclick="pdfToWord()">Convert to Word</button><div id="pdfWordResult" class="result"></div></div>
+<div class="card"><h3>📊 PDF to Excel <span class="badge badge-hot">HOT</span></h3><p>Extract PDF info to Excel</p><input type="file" id="pdfExcelFile" accept=".pdf"><button onclick="pdfToExcel()">Convert to Excel</button><div id="pdfExcelResult" class="result"></div></div>
+<div class="card"><h3>🔢 Add Page Numbers <span class="badge">FREE</span></h3><p>Add page numbers to your PDF</p><input type="file" id="pageNumFile" accept=".pdf"><button onclick="addPageNumbers()">Add Numbers</button><div id="pageNumResult" class="result"></div></div>
+</div>
+<div class="footer">© 2026 LargePDF Tools | Ghostscript 90% Compression | 10 High-Traffic Tools</div>
+</div>
+<div id="loading" class="loading">Processing...</div>
+<div id="error" class="error"></div>
+<script>
+function showLoading(s){var l=document.getElementById("loading");if(l)l.style.display=s?"block":"none";}
+function showError(m){var e=document.getElementById("error");e.innerHTML="❌ "+m;e.style.display="block";setTimeout(function(){e.style.display="none";},5000);}
+async function sendRequest(u,d,rid){showLoading(true);var rd=document.getElementById(rid);rd.style.display="none";rd.innerHTML="";try{var res=await fetch(u,{method:"POST",body:d});var j=await res.json();if(j.success){var h="<b>✅ Success!</b><br>";if(j.originalSize&&j.compressedSize)h+="Size: "+j.originalSize+" KB → "+j.compressedSize+" KB<br>Saved: "+j.savedPercent+"%<br>";if(j.message)h+=j.message+"<br>";if(j.pageCount)h+="Pages: "+j.pageCount+"<br>";h+='<a href="'+j.downloadUrl+'" download>📥 Download</a>';rd.innerHTML=h;rd.style.display="block";}else{showError(j.error);}}catch(err){showError(err.message);}finally{showLoading(false);}}
+function mergePDF(){var f1=document.getElementById("merge1").files[0];var f2=document.getElementById("merge2").files[0];if(!f1||!f2)return showError("Select 2 PDF files");var fd=new FormData();fd.append("pdfs",f1);fd.append("pdfs",f2);sendRequest("/merge",fd,"mergeResult");}
+function splitPDF(){var f=document.getElementById("splitFile").files[0];var r=document.getElementById("splitRange").value;if(!f)return showError("Select PDF");if(!r)return showError("Enter page range");var fd=new FormData();fd.append("pdfs",f);fd.append("pageRange",r);sendRequest("/split",fd,"splitResult");}
+function compressPDF(){var f=document.getElementById("compressFile").files[0];var l=document.getElementById("compressLevel").value;if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);fd.append("compressLevel",l);sendRequest("/compress",fd,"compressResult");}
+function excelToPDF(){var f=document.getElementById("excelFile").files[0];if(!f)return showError("Select Excel");var fd=new FormData();fd.append("excel",f);sendRequest("/excel-to-pdf",fd,"excelResult");}
+function wordToPDF(){var f=document.getElementById("wordFile").files[0];if(!f)return showError("Select Word");var fd=new FormData();fd.append("word",f);sendRequest("/word-to-pdf",fd,"wordResult");}
+function pdfToImage(){var f=document.getElementById("pdfImageFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/pdf-to-image",fd,"pdfImageResult");}
+function imageToPDF(){var f=document.getElementById("imagePdfFile").files[0];if(!f)return showError("Select image");var fd=new FormData();fd.append("images",f);sendRequest("/image-to-pdf",fd,"imagePdfResult");}
+function pdfToWord(){var f=document.getElementById("pdfWordFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/pdf-to-word",fd,"pdfWordResult");}
+function pdfToExcel(){var f=document.getElementById("pdfExcelFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/pdf-to-excel",fd,"pdfExcelResult");}
+function addPageNumbers(){var f=document.getElementById("pageNumFile").files[0];if(!f)return showError("Select PDF");var fd=new FormData();fd.append("pdfs",f);sendRequest("/add-page-numbers",fd,"pageNumResult");}
+</script>
+</body>
+</html>`;
 
 app.get('/', (req, res) => res.send(html));
 
@@ -129,7 +206,7 @@ app.post('/pdf-to-image', upload.array('pdfs', 1), async (req, res) => {
     try {
         const pdf = await PDFDocument.load(fs.readFileSync(req.files[0].path));
         const out = path.join(__dirname, 'uploads', 'pdf_image_' + Date.now() + '.txt');
-        fs.writeFileSync(out, 'File: ' + req.files[0].originalname + '\nPages: ' + pdf.getPageCount());
+        fs.writeFileSync(out, 'PDF to Image Report\nFile: ' + req.files[0].originalname + '\nPages: ' + pdf.getPageCount());
         fs.unlinkSync(req.files[0].path);
         res.json({ success: true, downloadUrl: '/download/' + path.basename(out), pageCount: pdf.getPageCount() });
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -151,7 +228,7 @@ app.post('/pdf-to-word', upload.array('pdfs', 1), async (req, res) => {
     try {
         const pdf = await PDFDocument.load(fs.readFileSync(req.files[0].path));
         const out = path.join(__dirname, 'uploads', 'pdf_word_' + Date.now() + '.doc');
-        fs.writeFileSync(out, 'File: ' + req.files[0].originalname + '\nPages: ' + pdf.getPageCount());
+        fs.writeFileSync(out, 'PDF to Word Report\nFile: ' + req.files[0].originalname + '\nPages: ' + pdf.getPageCount());
         fs.unlinkSync(req.files[0].path);
         res.json({ success: true, downloadUrl: '/download/' + path.basename(out) });
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -198,3 +275,4 @@ app.get('/download/:filename', (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0', () => console.log('✅ Server running on port ' + PORT));
+EOF
